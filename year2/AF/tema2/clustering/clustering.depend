@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1669586033 source:c:\users\adi\desktop\fmi\year2\af\tema2\clustering\main.cpp
+	<iostream>
+	<vector>
+	<fstream>
+	<algorithm>
+

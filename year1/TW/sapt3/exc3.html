@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .grid-container {
+        display: grid;
+        grid-template-columns:100px auto auto auto 100px;
+         background-color: #2196F3;
+         grid-template-areas: 
+     "one one two two three"
+     "four four five five six"
+     "four four seven seven eigth"
+     "nine twelve twelve twelve ten"
+     "eleven twelve twelve twelve ."; 
+        gap: 10px 8px;
+        padding: 10px;
+    }
+
+    .one {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: one;
+    }
+    .two {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: two;
+    }
+    .three {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: three;
+    }
+    .four {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: four;
+    }
+    .five {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: five;
+    }
+    .six {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: six;
+    }
+    .seven {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: seven;
+    }
+    .eigth {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: eigth;
+    }
+    .nine {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: nine;
+    }
+    .ten {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: ten;
+    }
+    .eleven {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: eleven;
+    }
+    .twelve {
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      font-size: 30px;
+      text-align: center;
+      grid-area: twelve;
+    }
+  </style>
+</head>
+<body>
+  <h1>Grid Elements</h1>
+  <div class="grid-container">
+    <div class="one">1</div>
+    <div class="two">2</div>
+    <div class="three">3</div>
+    <div class="four">4</div>
+    <div class="five">5</div>
+    <div class="six">6</div>
+    <div class="seven">7</div>
+    <div class="eigth">8</div>
+    <div class="nine">9</div>
+    <div class="ten">10</div>
+    <div class="eleven">11</div>
+    <div class="twelve">12</div>
+  </div>
+</body>
+</html>

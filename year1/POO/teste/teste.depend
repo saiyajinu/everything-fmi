@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1653296636 source:c:\users\adi\desktop\code\poo\teste\main.cpp
+	<algorithm>
+	<iostream>
+	<list>
+	<string>
+	<vector>
+

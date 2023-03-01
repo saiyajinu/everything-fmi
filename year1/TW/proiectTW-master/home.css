@@ -1,0 +1,345 @@
+* { 
+    margin: 0; 
+    padding: 0; 
+}
+div{
+    margin-bottom: 25px;
+}
+body{
+    background: #adadad;
+    font-family: "Lato", sans-serif;
+}
+#footer{
+    margin-top: 150px;
+    text-align: right;
+    padding: 20px;
+    padding-right: 40px;
+    color: red;
+    background-color: black;
+}
+#footer p{
+    cursor: pointer;
+}
+p{
+    margin: 0;
+}
+#titlu{
+    font-family: 'VALORANT', sans-serif;                                              
+    margin-top: 140px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 50px;
+    scroll-margin-top: 120px;
+}
+
+#divimg2{
+    width:32vw;
+    text-align:center;
+    display:block;
+    margin-right: 10px;
+    margin-bottom: 1px;
+    float:left;
+    flex: 1;
+}
+
+#imag2{
+    width: 30vw;
+}
+
+#par1{
+    margin-top: 30px;
+    display: inline-flex;
+}
+#par2{
+    margin-top: 50px;
+    display: inline-flex;
+}
+.main {
+    height: 100%;
+}
+
+.header {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    top: 0px;
+    position: fixed;
+    width: 100%;
+    overflow: hidden;
+    padding: 20px 10px;
+    padding-bottom: 0;
+    background: black;
+    color: white;
+    font-size: 15px;
+}
+
+.header a {
+    float: left;
+    color: #ff4655;
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 25px;
+    border-radius: 4px;
+}
+
+.imghead {
+    width: 150px;
+}
+
+.header-right a:hover {
+    background-color: #ff4655;
+    color: white;
+}
+
+.header-right {
+    float: right;
+    margin-right: 15px;
+}
+
+@media screen and (max-width: 500px) {
+    .header a {
+        float: none;
+        display: block;
+        text-align: left;
+    }
+
+    .header-right {
+        float: none;
+    }
+}
+
+.divimag1{
+    margin-top: 20px;
+    background-color: #ff4655;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.imag1{
+    width: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.subtitlu{
+    font-family: 'VALORANT', sans-serif; 
+    margin-top: 40px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 30px;
+    scroll-margin-top: 120px;
+}
+
+#divimg2{
+    margin-left: 6%;
+}
+
+.paragrafdreapta{
+    text-indent: 9%;
+    font-size: 20px;
+    margin-left: 6%;
+    margin-right: 6%;
+}
+
+footer{
+    margin-top: 150px;
+    background-color: #f1f1f1;
+}
+
+.textimagistica{
+    font-size: 20px;
+    margin-left: 15%;
+    margin-right: 15%;
+    text-align: center;
+    color: #000000;
+}
+
+.divimg3{
+    display: flex;
+    background-color: #ff4655;
+    padding-top: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+.divimg3 span{
+    display: block;
+    padding-top: 20px;
+}
+
+.divimg3 img{
+
+    width:150px;
+    transition: width 2s;
+}
+
+.gridA{
+    flex: 25%;
+}
+
+
+.divimg3 img:hover{
+    width: 200px;
+}
+
+.divimg3 p{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.img4{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 630px;
+}
+
+.divimg4{
+    padding-top: 20px;
+    background-color: #ff4655; 
+    font-style: italic;
+}
+
+.divimg4:hover{
+    animation: rgb 15s forwards;
+}
+
+@keyframes rgb {
+    0% {
+        background-color: #ff4655;
+      }
+    17% {
+        background-color: orange;
+      }
+    34% {
+        background-color: yellow;
+      }
+    51% {
+        background-color: greenyellow;
+      }
+    69% {
+        background-color: lightblue;
+      }
+    89% {
+        background-color: blue;
+      }
+    100% {
+        background-color: indigo;
+      }
+}
+
+.divimg4 p{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.divimg5{
+    float: right;
+    width: 325px;
+    margin-right: 6%;
+    margin-left: 6%;
+    margin-bottom: 15px;
+    text-align: center;
+    font-style: italic;
+}
+
+#img5{
+    width: 325px;
+}
+
+.divimgright{
+    margin-top: 40px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+.divimg5 p{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.textimagradio{
+    font-size: 20px;
+    color: black;
+    margin-left: 5%;
+}
+
+.textimagradio ul li{
+    margin-left: 5%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.coloredbackground{
+    background-color: #ff4655;
+}
+
+form{
+    text-align:center;
+    font-size: larger;
+    font-weight: bold;
+}
+input{
+    margin-top: 5px;
+    width: 10%
+}
+
+#cap {
+    display: table;
+    padding: 5px;
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: x-large;
+    text-align: center;
+    background-color: gray;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#pickdiv{
+    text-align: center;
+}
+
+#pickdiv button{
+    margin-top: 50px;
+    background-color: #ff4655; 
+    border: 1px solid black;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#pickdiv button:hover{
+    background-color: #f36c77;
+}
+
+#pickdiv div{
+    margin-top: 10px;
+}
+
+#pickdiv img{
+    margin-top: 5px;
+    width: 8%;
+}
+
+#pickdiv p{
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+
+#todelete{
+    font-size: larger;
+}

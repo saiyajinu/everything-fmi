@@ -1,0 +1,62 @@
+#
+#
+#
+#
+Sigma:
+    0
+    1
+    #
+End
+#
+#
+#
+Gamma:
+    x
+    1
+    0
+    #
+End
+#
+#
+#
+#
+States:
+    state0 ,S
+    state1
+    state2
+    state3
+    state4
+    state5
+    state6
+    state7
+    state8 ,F
+End
+#
+#
+#
+#
+Transitions:
+    0 0 x R 1
+    1 0 0 R 1
+    1 1 1 R 1
+    1 # # R 3
+    3 x x R 3
+    3 0 x L 5
+    5 0 0 L 5
+    5 1 1 L 5
+    5 x x L 5
+    5 # # L 6
+    6 0 0 L 6
+    6 1 1 L 6
+    6 x x R 0
+    0 1 x R 2
+    2 0 0 R 2
+    2 1 1 R 2
+    2 # # R 4
+    4 x x R 4
+    4 1 x L 5
+    0 # # R 7
+    7 x x R 7
+    7 b b R 8
+End
+0101#0101
