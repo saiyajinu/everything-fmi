@@ -1,0 +1,170 @@
+{
+  "main": {
+    "id": "b291fd0cc6c0ad21",
+    "type": "split",
+    "children": [
+      {
+        "id": "ff7a20e29e8126b5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "9e172d694f914c1a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "TO-DO.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "ce8f148bdda57377",
+    "type": "split",
+    "children": [
+      {
+        "id": "8374e16820349f82",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "41de60c9edef0ea4",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "027ccaecb4a37491",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "bf1884c387951f3b",
+            "type": "leaf",
+            "state": {
+              "type": "starred",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "fc29b6cfd37095f1",
+    "type": "split",
+    "children": [
+      {
+        "id": "344f58819db9995e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1cacd505f6f3b443",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "TO-DO.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "f96c7bdd44e1225d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "TO-DO.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "fbe4778d3843418e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "26122d6e54ab2c68",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "TO-DO.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "9e172d694f914c1a",
+  "lastOpenFiles": [
+    "Y2S1/DAW.md",
+    "TO-DO.md",
+    "Y2S2/MDS.md",
+    "Y2S2/FLP.md",
+    "Y2S2/AA.md",
+    "Y2S2/RetC.md",
+    "Y2S1/Untitled.md",
+    "Y2S2/IA.md",
+    "Y2S1/PS.md",
+    "Y2S2/PAO.md",
+    "Y2S1/SO.md",
+    "Y2S1/AF.md",
+    "Y2S1/PF.md",
+    "Y2S1/SGBD.md",
+    "Y2S2",
+    "Y2S1",
+    "Y1S2",
+    "Y1S1"
+  ]
+}
