@@ -22,8 +22,19 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "concat",
-    pattern: "concatenare/"
-    defaults: new { controller = ""});
+    pattern: "concatenare/{str1}/{str2}",
+    defaults: new { controller = "Examples", action = "Index" });
+
+app.MapControllerRoute(
+    name: "produs",
+    pattern: "produs/{int1}/{int2?}",
+    defaults: new { controller = "Examples", action = "Index1" });
+
+app.MapControllerRoute(
+    name: "op",
+    pattern: "operatie/{int1?}/{int2?}/{op?}",
+    defaults: new { controller = "Examples", action = "Index2" }
+    );
 
 app.MapControllerRoute(
     name: "default",
