@@ -21,6 +21,18 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "search",
+    pattern: "search/telefon/{telefon}",
+    defaults: new { controller = "Search", action = "NumarTelefon" }
+    );
+
+app.MapControllerRoute(
+    name: "search",
+    pattern: "search/cnp/{cnp}",
+    defaults: new { controller = "Search", action = "CNP" }
+    );
+
+app.MapControllerRoute(
     name: "concat",
     pattern: "concatenare/{str1}/{str2}",
     defaults: new { controller = "Examples", action = "Index" });
