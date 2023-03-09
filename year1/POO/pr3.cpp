@@ -37,7 +37,7 @@ public:
 
     Produs& operator=(const Produs& prod){
         if(this != &prod){
-            
+
             this->nume = prod.nume;
             this->pret = prod.pret;
             this->culoare = prod.culoare;
@@ -252,7 +252,7 @@ public:
     friend ostream& operator<<(ostream& out, MouseWireless& mousew){
         return mouse.write(out);
     }
-}
+};
 
 class Client{
 private:
