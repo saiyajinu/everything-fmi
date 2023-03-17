@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\curs5.props" />
+</Project>
