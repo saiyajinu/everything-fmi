@@ -1,0 +1,2 @@
+ddd,argint,5,5
+eee,plastic,3,1
