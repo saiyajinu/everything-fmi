@@ -12,33 +12,24 @@ convexList = [P[0], P[1]]
 
 def direction(p1,p2,p3):
     area = p1[0] * (p2[1] - p3[1]) + p2[0] * (p3[1] - p1[1]) + p3[0] * (p1[1] - p2[1])
-    ##print(p1,p2,p3)
     if area == 0:   #touch
-        ##print("touch")
         convexList.pop()
         convexList.append(p3)
     elif area > 0:  #left
-        ##print("left")
+
         convexList.append(p3)
     else:           #right
-        ##print("right")
         convexList.pop()
-        #convexList.append(p3)
-        #direction(convexList[len(convexList)-3],convexList[len(convexList)-2],convexList[len(convexList)-1])
+        convexList.append(p3)
 
 i= 2
-##print("init conv = ", convexList)
-
 while i<=n:
     p1 = convexList[len(convexList)-2]
     p2 = convexList[len(convexList)-1]
     p3 = P[i]
     direction(p1, p2, p3)
-    ##print("conv = ", convexList)
-    ##print("--------------------")
     i += 1
-if(convexList[len(convexList)-1] == start):
-    convexList.pop()
+convexList.pop()
 
 p1 = convexList[len(convexList)-1]
 p2 = convexList[0]
