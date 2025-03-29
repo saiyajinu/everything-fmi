@@ -1,0 +1,30 @@
+--create or replace TYPE vector IS VARRAY(20) OF NUMBER(6,0); 
+DECLARE
+ta vector:= vector();
+TYPE tablou_indexat IS TABLE OF employees%ROWTYPE INDEX BY BINARY_INTEGER;
+t tablou_indexat;
+BEGIN
+
+select ang.* 
+bulk collect into t 
+from employees ang
+where rownum<=3;
+
+
+FOR i IN t.FIRST..t.LAST LOOP
+ta.delete;
+DBMS_OUTPUT.PUT_LINE(t(i).employee_id);
+select employee_id
+bulk collect into ta
+from employees
+where manager_id=t(i).employee_id;
+INSERT INTO manageri_242 VALUES (t(i).employee_id, t(i).first_name, ta);
+dbms_output.new_line;
+
+END LOOP;
+--create table manageri_242 (id number(6,0) ,nume VARCHAR2(25 BYTE),lista vector);
+
+
+
+end;
+select * from manageri_242

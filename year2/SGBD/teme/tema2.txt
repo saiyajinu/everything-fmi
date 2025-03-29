@@ -1,0 +1,42 @@
+E1:
+DECLARE
+    TYPE emp_id_array IS VARRAY(20) OF NUMBER(6);
+    emp_ids emp_id_array;
+    salary_var NUMBER(8, 2) := 0;
+BEGIN
+    SELECT employee_id BULK COLLECT INTO emp_ids
+    FROM (SELECT employee_id
+        FROM employees
+        WHERE commission_pct IS NULL
+        ORDER BY salary)
+    WHERE ROWNUM < 6;
+    FOR i IN 1..5 LOOP
+        SELECT salary INTO salary_var
+        FROM employees
+        WHERE employee_id = emp_ids(i);
+        DBMS_OUTPUT.PUT_LINE(salary_var || ' ');
+    END LOOP;
+    FOR i IN 1..5 LOOP
+        SELECT salary INTO salary_var
+        FROM employees
+        WHERE employee_id = emp_ids(i);
+        salary_var := salary_var + (5 / 100) * salary_var;
+        DBMS_OUTPUT.PUT_LINE(salary_var || ' ');
+    END LOOP;
+END;
+
+E2:
+CREATE OR REPLACE TYPE tip_orase_SAI AS VARRAY(20) OF VARCHAR2(50);
+
+CREATE TABLE excursie_SAI (
+    cod_excursie NUMBER(4),
+    denumire VARCHAR2(20),
+    orase tip_orase_SAI,
+    status VARCHAR2(20)
+);
+
+INSERT INTO excursie_SAI VALUES (1, 'Excursie 1', tip_orase_SAI('Oras1', 'Oras2', 'Oras3'), 'Disponibila');
+INSERT INTO excursie_SAI VALUES (2, 'Excursie 2', tip_orase_SAI('Oras2', 'Oras4', 'Oras5'), 'Disponibila');
+INSERT INTO excursie_SAI VALUES (3, 'Excursie 3', tip_orase_SAI('Oras1', 'Oras3', 'Oras5'), 'Disponibila');
+INSERT INTO excursie_SAI VALUES (4, 'Excursie 4', tip_orase_SAI('Oras3', 'Oras4'), 'Disponibila');
+INSERT INTO excursie_SAI VALUES (5, 'Excursie 5', tip_orase_SAI('Oras5', 'Oras1', 'Oras2'), 'Disponibila');

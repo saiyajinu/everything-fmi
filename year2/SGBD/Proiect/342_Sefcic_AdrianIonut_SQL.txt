@@ -1,0 +1,583 @@
+CREATE TABLE ECHIPA (
+    id_echipa NUMBER PRIMARY KEY,
+    nume VARCHAR2(50),
+    tara VARCHAR2(50),
+    data_creare DATE
+);
+
+CREATE TABLE JUCATOR (
+    id_jucator NUMBER PRIMARY KEY,
+    nume VARCHAR2(50),
+    nationalitate VARCHAR2(50),
+    twitter VARCHAR2(30),
+    id_echipa NUMBER,
+    FOREIGN KEY (id_echipa) REFERENCES ECHIPA(id_echipa) 
+);
+
+
+CREATE TABLE SPONSOR (
+    id_sponsor NUMBER PRIMARY KEY,
+    nume VARCHAR2(50),
+    industrie VARCHAR2(50),
+    data_creare DATE
+);
+
+CREATE TABLE ECHIPA_SPONSOR (
+    id_echipa NUMBER,
+    id_sponsor NUMBER,
+    PRIMARY KEY (id_echipa, id_sponsor),
+    FOREIGN KEY (id_echipa) REFERENCES ECHIPA(id_echipa),
+    FOREIGN KEY (id_sponsor) REFERENCES SPONSOR(id_sponsor)
+);
+
+CREATE TABLE TURNEU (
+    id_turneu NUMBER PRIMARY KEY,
+    loc_desfasurare VARCHAR2(100),
+    tara VARCHAR2(50),
+    fond_premii NUMBER
+);
+
+CREATE TABLE COMENTATOR (
+    id_comentator NUMBER PRIMARY KEY,
+    nume VARCHAR2(100),
+    specializare VARCHAR2(50),
+    twitter VARCHAR2(255)
+);
+
+
+CREATE TABLE MECI (
+    id_meci NUMBER PRIMARY KEY,
+    data DATE,
+    duratie NUMBER,
+    etapa VARCHAR2(50),
+    id_comentator NUMBER,
+    id_turneu NUMBER,
+    FOREIGN KEY (id_comentator) REFERENCES COMENTATOR(id_comentator)
+);
+CREATE TABLE JUCATOR_MECI (
+    id_jucator1 NUMBER,
+    id_jucator2 NUMBER,
+    id_meci NUMBER,
+    PRIMARY KEY (id_jucator1, id_jucator2, id_meci),
+    FOREIGN KEY (id_jucator1) REFERENCES JUCATOR(id_jucator),
+    FOREIGN KEY (id_jucator2) REFERENCES JUCATOR(id_jucator),
+    FOREIGN KEY (id_meci) REFERENCES MECI(id_meci)
+);
+INSERT INTO COMENTATOR VALUES (1, 'Sophie Müller', 'Color', 'sophiemuller');
+INSERT INTO COMENTATOR VALUES (2, 'Luca Rossi', 'Play By Play', 'therealrossi');
+INSERT INTO COMENTATOR VALUES (3, 'Elena Popescu', 'Play By Play', 'popescuelena');
+INSERT INTO COMENTATOR VALUES (4, 'Andreas Schmidt', 'Play By Play', 'aschmidt');
+INSERT INTO COMENTATOR VALUES (5, 'Isabella Conte', 'Color', 'isabella_conte');
+INSERT INTO COMENTATOR VALUES(6, 'Testeanu Verif', 'Play By Play', '@verift');
+
+INSERT INTO TURNEU VALUES (100, 'Berlin Esports Arena', 'Germany', 100000);
+INSERT INTO TURNEU VALUES (101, 'Paris Gaming Stadium', 'France', 120000);
+INSERT INTO TURNEU VALUES (102, 'London Esports Center', 'United Kingdom', 90000);
+INSERT INTO TURNEU VALUES (103, 'Stockholm Esports Hall', 'Sweden', 110000);
+INSERT INTO TURNEU VALUES (104, 'Madrid Gaming Arena', 'Spain', 95000);
+
+INSERT INTO SPONSOR VALUES (200, 'TechGear', 'Technology', TO_DATE('2023-03-01', 'YYYY-MM-DD'));
+INSERT INTO SPONSOR VALUES (201, 'FinanceCorp', 'Finance', TO_DATE('2023-04-01', 'YYYY-MM-DD'));
+INSERT INTO SPONSOR VALUES (202, 'GamingTech', 'Gaming', TO_DATE('2023-05-01', 'YYYY-MM-DD'));
+INSERT INTO SPONSOR VALUES (203, 'FashionArena', 'Fashion', TO_DATE('2023-06-01', 'YYYY-MM-DD'));
+INSERT INTO SPONSOR VALUES (204, 'FoodFiesta', 'Food', TO_DATE('2023-07-01', 'YYYY-MM-DD'));
+
+INSERT INTO ECHIPA VALUES (300, 'G2 Esports', 'Germany', TO_DATE('2023-01-01', 'YYYY-MM-DD'));
+INSERT INTO ECHIPA VALUES (301, 'Fnatic', 'France', TO_DATE('2023-02-01', 'YYYY-MM-DD'));
+INSERT INTO ECHIPA VALUES (302, 'Ninjas in Pyjamas', 'Sweden', TO_DATE('2023-03-01', 'YYYY-MM-DD'));
+INSERT INTO ECHIPA VALUES (303, 'Team Vitality', 'Italy', TO_DATE('2023-04-01', 'YYYY-MM-DD'));
+INSERT INTO ECHIPA VALUES (304, 'OG Esports', 'Spain', TO_DATE('2023-05-01', 'YYYY-MM-DD'));
+
+INSERT INTO ECHIPA_SPONSOR VALUES (300, 200);
+INSERT INTO ECHIPA_SPONSOR VALUES (301, 201);
+INSERT INTO ECHIPA_SPONSOR VALUES (302, 202);
+INSERT INTO ECHIPA_SPONSOR VALUES (303, 203);
+INSERT INTO ECHIPA_SPONSOR VALUES (304, 204);
+INSERT INTO ECHIPA_SPONSOR VALUES (300, 201);
+INSERT INTO ECHIPA_SPONSOR VALUES (301, 202);
+INSERT INTO ECHIPA_SPONSOR VALUES (302, 203);
+INSERT INTO ECHIPA_SPONSOR VALUES (303, 204);
+INSERT INTO ECHIPA_SPONSOR VALUES (304, 200);
+
+INSERT INTO JUCATOR VALUES (400, 'Maximilian Schmidt', 'Germany', 'max_smith_gamer', 300);
+INSERT INTO JUCATOR VALUES (401, 'Rafael Silva', 'Portugal', 'rafael_silva_esports', 300);
+INSERT INTO JUCATOR VALUES (402, 'Lukas Novak', 'Czech Republic', 'lukas_novak_88', 301);
+INSERT INTO JUCATOR VALUES (403, 'Igor Petrov', 'Russia', 'iggy_petrov', 301);
+INSERT INTO JUCATOR VALUES (404, 'Matej Horvat', 'Slovenia', 'matty_horizon', 302);
+INSERT INTO JUCATOR VALUES (405, 'Gustav Berg', 'Sweden', 'gustav_b_thunder', 302);
+INSERT INTO JUCATOR VALUES (406, 'Luca Rossi', 'Italy', 'luca_the_sniper', 303);
+INSERT INTO JUCATOR VALUES (407, 'Carlos López', 'Spain', 'carlos_lightning', 303);
+INSERT INTO JUCATOR VALUES (408, 'Sebastian Weber', 'Germany', 'seb_gaming_master', 304);
+INSERT INTO JUCATOR VALUES (409, 'Antonio Costa', 'Portugal', 'toni_costa_legend', 304);
+INSERT INTO JUCATOR VALUES (410, 'Adriano Sai', 'Romania', 'saimeistr', 304);
+
+INSERT INTO MECI VALUES (500, TO_DATE('2023-08-01', 'YYYY-MM-DD'), 30, 'Semifinals', 1, 100);
+INSERT INTO MECI VALUES (501, TO_DATE('2023-08-03', 'YYYY-MM-DD'), 35, 'Semifinals', 2, 100);
+INSERT INTO MECI VALUES (502, TO_DATE('2023-08-06', 'YYYY-MM-DD'), 40, 'Grand Finals', 3, 100);
+INSERT INTO MECI VALUES (503, TO_DATE('2023-08-10', 'YYYY-MM-DD'), 25, 'Semifinals', 4, 101);
+INSERT INTO MECI VALUES (504, TO_DATE('2023-08-15', 'YYYY-MM-DD'), 30, 'Semifinals', 5, 101);
+INSERT INTO MECI VALUES (505, TO_DATE('2023-08-18', 'YYYY-MM-DD'), 35, 'Grand Finals', 1, 101);
+INSERT INTO MECI VALUES (506, TO_DATE('2023-08-22', 'YYYY-MM-DD'), 20, 'Semifinals', 2, 102);
+INSERT INTO MECI VALUES (507, TO_DATE('2023-08-26', 'YYYY-MM-DD'), 25, 'Semifinals', 3, 102);
+INSERT INTO MECI VALUES (508, TO_DATE('2023-08-30', 'YYYY-MM-DD'), 30, 'Grand Finals', 4, 102);
+INSERT INTO MECI VALUES (509, TO_DATE('2023-09-4', 'YYYY-MM-DD'), 33, 'Semifinals', 5, 103);
+INSERT INTO MECI VALUES (510, TO_DATE('2023-09-5', 'YYYY-MM-DD'), 27, 'Semifinals', 1, 103);
+INSERT INTO MECI VALUES (511, TO_DATE('2023-09-7', 'YYYY-MM-DD'), 43, 'Grand Finals', 2, 103);
+INSERT INTO MECI VALUES (512, TO_DATE('2023-09-7', 'YYYY-MM-DD'), 21, 'Showmatch', 1, 103);
+
+INSERT INTO JUCATOR_MECI VALUES (400, 401, 500); 
+INSERT INTO JUCATOR_MECI VALUES (402, 403, 501); 
+INSERT INTO JUCATOR_MECI VALUES (400, 402, 502); 
+INSERT INTO JUCATOR_MECI VALUES (404, 405, 503); 
+INSERT INTO JUCATOR_MECI VALUES (406, 407, 504);
+INSERT INTO JUCATOR_MECI VALUES (404, 406, 505);
+INSERT INTO JUCATOR_MECI VALUES (407, 408, 506); 
+INSERT INTO JUCATOR_MECI VALUES (409, 401, 507); 
+INSERT INTO JUCATOR_MECI VALUES (409, 408, 508);
+INSERT INTO JUCATOR_MECI VALUES (402, 404, 509); 
+INSERT INTO JUCATOR_MECI VALUES (401, 407, 510); 
+INSERT INTO JUCATOR_MECI VALUES (401, 402, 511);
+CREATE OR REPLACE PROCEDURE cerinta6 (nume Sponsor.nume%TYPE, nume_doi Sponsor.nume%TYPE)
+AS
+    TYPE tabel_indexat IS TABLE OF Echipa%ROWTYPE INDEX BY PLS_INTEGER;
+    t tabel_indexat;
+    TYPE tabel_imbricat IS TABLE OF VARCHAR2(50);
+    y tabel_imbricat;
+    TYPE vector IS VARRAY(20) OF NUMBER;
+    u vector:= vector();
+    
+BEGIN
+    SELECT E.*
+    BULK COLLECT INTO t
+    FROM ECHIPA E
+    JOIN ECHIPA_SPONSOR ES ON E.ID_ECHIPA = ES.ID_ECHIPA
+    JOIN SPONSOR S ON ES.ID_SPONSOR = S.ID_SPONSOR
+    WHERE S.NUME = cerinta6.nume;
+    u.extend;
+    u(1) := t.COUNT;
+    FOR i IN 1..t.COUNT LOOP
+        DBMS_OUTPUT.PUT_LINE(t(i).nume || ', ' || t(i).id_echipa);
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('');
+    
+    SELECT E.nume
+    BULK COLLECT INTO y
+    FROM ECHIPA E
+    JOIN ECHIPA_SPONSOR ES ON E.ID_ECHIPA = ES.ID_ECHIPA
+    JOIN SPONSOR S ON ES.ID_SPONSOR = S.ID_SPONSOR
+    WHERE S.NUME = cerinta6.nume_doi;
+    u.extend;
+    u(2) := y.COUNT;
+    FOR i IN 1..y.COUNT LOOP
+        DBMS_OUTPUT.PUT_LINE(y(i));
+    END LOOP;
+    DBMS_OUTPUT.PUT_LINE('');
+    DBMS_OUTPUT.PUT_LINE(u(1) || ', ' || u(2));   
+END cerinta6;
+/
+
+BEGIN
+    cerinta6('FinanceCorp', 'GamingTech');
+END;
+
+CREATE OR REPLACE PROCEDURE cerinta7 AS
+    CURSOR c1 IS
+        SELECT j.id_jucator, j.nume, j.id_echipa
+        FROM JUCATOR j;
+    CURSOR c2 (v_id_echipa ECHIPA.id_echipa%TYPE) IS
+        SELECT COUNT(*)
+        FROM ECHIPA e
+        JOIN JUCATOR j ON e.id_echipa = j.id_echipa
+        WHERE e.id_echipa = v_id_echipa;
+    
+    v_id_jucator JUCATOR.id_jucator%TYPE;
+    v_nume_jucator JUCATOR.nume%TYPE;
+    v_id_echipa ECHIPA.id_echipa%TYPE;
+    v_total_jucatori NUMBER;
+
+BEGIN
+    OPEN c1;
+    LOOP
+        FETCH c1 INTO v_id_jucator, v_nume_jucator, v_id_echipa;
+        EXIT WHEN c1%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_id_jucator || ', ' || v_nume_jucator);
+        OPEN c2(v_id_echipa);
+        FETCH c2 INTO v_total_jucatori;
+        DBMS_OUTPUT.PUT_LINE('are ' || (v_total_jucatori - 1) || ' coechipier(i).');
+        CLOSE c2;
+    END LOOP;
+    CLOSE c1;
+END;
+/
+
+BEGIN
+    cerinta7();
+END;
+/
+
+CREATE OR REPLACE FUNCTION cerinta8(id NUMBER) RETURN NUMBER IS 
+    nr_turnee NUMBER;
+    aux NUMBER;
+    nume_com COMENTATOR.nume%TYPE;
+    v_comentator COMENTATOR%ROWTYPE;
+    WRONG_ID EXCEPTION;
+    NO_TOURNAMENTS EXCEPTION;
+
+BEGIN
+    SELECT COUNT(*) into aux
+    FROM comentator
+    WHERE id_comentator = id;
+    
+    IF aux = 0 THEN
+        RAISE WRONG_ID;
+    END IF;
+        
+    SELECT COUNT(DISTINCT t.id_turneu) into nr_turnee
+    FROM MECI m
+    JOIN COMENTATOR c on m.id_comentator = c.id_comentator
+    JOIN TURNEU t on m.id_turneu = t.id_turneu
+    WHERE m.id_comentator = id;
+    
+    
+    IF nr_turnee = 0 THEN
+        RAISE NO_TOURNAMENTS;
+    END IF;
+    
+    RETURN nr_turnee;
+    
+EXCEPTION
+    WHEN WRONG_ID THEN
+        DBMS_OUTPUT.PUT_LINE('Niciun comentator nu are acest id');
+        RETURN -1;
+    WHEN NO_TOURNAMENTS THEN
+        DBMS_OUTPUT.PUT_LINE('Comentatorul nu a fost la niciun turneu');
+        RETURN -1;
+END;
+/
+
+DECLARE 
+    nr NUMBER;
+BEGIN
+    nr := cerinta8(1);
+    DBMS_OUTPUT.PUT_LINE(nr);
+    nr := cerinta8(6);
+    DBMS_OUTPUT.PUT_LINE(nr);
+    nr := cerinta8(7);
+    DBMS_OUTPUT.PUT_LINE(nr);
+END;
+/
+
+CREATE OR REPLACE PROCEDURE cerinta9(id NUMBER)
+AS
+    TYPE vector_id_echipe IS VARRAY(2) OF NUMBER;
+    u vector_id_echipe:= vector_id_echipe();
+    v_sponsor VARCHAR2(50);
+    NO_DATA_FOUND EXCEPTION;
+    TOO_MANY_ROWS EXCEPTION;
+    aux NUMBER;
+    WRONG_ID EXCEPTION;
+    
+    
+BEGIN
+    SELECT COUNT(*) into aux
+    FROM meci
+    WHERE id_meci = id;
+    
+    IF aux = 0 THEN
+        RAISE WRONG_ID;
+    END IF;
+
+
+    FOR rec IN (
+        SELECT DISTINCT j.id_echipa
+        FROM meci m 
+        JOIN jucator_meci jm ON m.id_meci = jm.id_meci
+        JOIN jucator j ON jm.id_jucator1 = j.id_jucator OR jm.id_jucator2 = j.id_jucator
+        WHERE m.id_meci = id
+    ) LOOP
+        u.EXTEND;
+        u(u.LAST) := rec.id_echipa;
+    END LOOP;
+    IF u(u.LAST) IS null THEN
+        RAISE NO_DATA_FOUND;
+        RETURN;
+    END IF;
+    IF u.COUNT > 2 THEN
+        RAISE TOO_MANY_ROWS;
+        RETURN;
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE(u.LAST);
+    DBMS_OUTPUT.PUT_LINE('Pentru meciul ' || id);
+    FOR val in 1..u.COUNT LOOP
+        IF u.COUNT = 1 THEN
+            DBMS_OUTPUT.PUT_LINE('Ambii jucatori fac parte din aceeasi organizatie (' || u(1) || ')');
+            DBMS_OUTPUT.PUT_LINE('Sponsorii prezenti sunt:');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Echipa jucatorului ' || val || ' (' || u(1) || ') are sponsorii:');
+        END IF;
+        FOR rez IN (SELECT s.nume
+              FROM sponsor s
+              JOIN echipa_sponsor es ON es.id_sponsor = s.id_sponsor
+              JOIN echipa e ON e.id_Echipa = es.id_echipa AND e.id_echipa = u(val))
+        LOOP
+            v_sponsor := rez.nume;
+            DBMS_OUTPUT.PUT_LINE(v_sponsor);
+        END LOOP;
+    END LOOP;
+    
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('no data found');
+        WHEN TOO_MANY_ROWS THEN
+            DBMS_OUTPUT.PUT_LINE('too many rows');
+        WHEN WRONG_ID THEN
+            DBMS_OUTPUT.PUT_LINE('wrong id');
+    
+END;
+/
+
+BEGIN
+    cerinta9(511);DBMS_OUTPUT.PUT_LINE(' ');
+    cerinta9(513);DBMS_OUTPUT.PUT_LINE(' ');
+    cerinta9(550);DBMS_OUTPUT.PUT_LINE(' ');
+END;
+/
+
+INSERT INTO JUCATOR VALUES (411, 'Test 1', 'test1', 'test1', null);
+INSERT INTO JUCATOR VALUES (412, 'Test2', 'test2', 'test2', null);
+INSERT INTO MECI VALUES (513, TO_DATE('2023-09-7', 'YYYY-MM-DD'), 21, 'test', 1, 103);
+INSERT INTO JUCATOR_MECI VALUES (411, 412, 513); 
+
+CREATE OR REPLACE TRIGGER cerinta10
+BEFORE INSERT OR UPDATE OR DELETE ON MECI
+DECLARE
+    ora CONSTANT NUMBER := 18;
+BEGIN
+    IF TO_NUMBER(TO_CHAR(SYSDATE, 'HH24')) >= ora THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Operatiuni interzise dupa ora ' || ora || ':00');
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER cerinta11
+BEFORE UPDATE OF id_jucator ON JUCATOR
+FOR EACH ROW
+WHEN (new.id_jucator <> old.id_jucator)
+BEGIN
+    RAISE_APPLICATION_ERROR(-20001, 'ID-ul jucatorului trebuie sa ramana la fel');
+END;
+/
+
+CREATE TABLE audit_cerinta12(
+    utilizator VARCHAR2(30),
+    nume_bd VARCHAR2(50),
+    eveniment VARCHAR2(20),
+    nume_obiect VARCHAR2(30),
+    data DATE);
+
+CREATE OR REPLACE TRIGGER cerinta12
+    AFTER CREATE OR DROP OR ALTER ON SCHEMA
+BEGIN
+    INSERT INTO audit_cerinta12
+    VALUES (SYS.LOGIN_USER, SYS.DATABASE_NAME, SYS.SYSEVENT, 
+    SYS.DICTIONARY_OBJ_NAME, SYSDATE);
+END;
+/
+
+CREATE TABLE audit_test(col_test VARCHAR(10), col_test_2 NUMBER(5));
+ALTER TABLE audit_test DROP COLUMN col_test;
+DROP TABLE audit_test;
+SELECT * FROM audit_cerinta12;
+
+
+
+
+CREATE OR REPLACE PACKAGE cerinta13
+AS
+    PROCEDURE cerinta6(nume Sponsor.nume%TYPE, nume_doi Sponsor.nume%TYPE);
+    PROCEDURE cerinta7;
+    FUNCTION cerinta8(id NUMBER) RETURN NUMBER;
+    PROCEDURE cerinta9(id NUMBER);
+END cerinta13;
+/
+
+CREATE OR REPLACE PACKAGE BODY cerinta13
+AS
+    PROCEDURE cerinta6 (nume Sponsor.nume%TYPE, nume_doi Sponsor.nume%TYPE) AS
+        TYPE tabel_indexat IS TABLE OF Echipa%ROWTYPE INDEX BY PLS_INTEGER;
+        t tabel_indexat;
+        TYPE tabel_imbricat IS TABLE OF VARCHAR2(50);
+        y tabel_imbricat;
+        TYPE vector IS VARRAY(20) OF NUMBER;
+        u vector:= vector();
+        
+    BEGIN
+        SELECT E.*
+        BULK COLLECT INTO t
+        FROM ECHIPA E
+        JOIN ECHIPA_SPONSOR ES ON E.ID_ECHIPA = ES.ID_ECHIPA
+        JOIN SPONSOR S ON ES.ID_SPONSOR = S.ID_SPONSOR
+        WHERE S.NUME = cerinta6.nume;
+        u.extend;
+        u(1) := t.COUNT;
+        FOR i IN 1..t.COUNT LOOP
+            DBMS_OUTPUT.PUT_LINE(t(i).nume || ', ' || t(i).id_echipa);
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('');
+        
+        SELECT E.nume
+        BULK COLLECT INTO y
+        FROM ECHIPA E
+        JOIN ECHIPA_SPONSOR ES ON E.ID_ECHIPA = ES.ID_ECHIPA
+        JOIN SPONSOR S ON ES.ID_SPONSOR = S.ID_SPONSOR
+        WHERE S.NUME = cerinta6.nume_doi;
+        u.extend;
+        u(2) := y.COUNT;
+        FOR i IN 1..y.COUNT LOOP
+            DBMS_OUTPUT.PUT_LINE(y(i));
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('');
+        DBMS_OUTPUT.PUT_LINE(u(1) || ', ' || u(2));   
+    END;
+    
+    PROCEDURE cerinta7 AS
+    CURSOR c1 IS
+        SELECT j.id_jucator, j.nume, j.id_echipa
+        FROM JUCATOR j;
+    CURSOR c2 (v_id_echipa ECHIPA.id_echipa%TYPE) IS
+        SELECT COUNT(*)
+        FROM ECHIPA e
+        JOIN JUCATOR j ON e.id_echipa = j.id_echipa
+        WHERE e.id_echipa = v_id_echipa;
+    
+    v_id_jucator JUCATOR.id_jucator%TYPE;
+    v_nume_jucator JUCATOR.nume%TYPE;
+    v_id_echipa ECHIPA.id_echipa%TYPE;
+    v_total_jucatori NUMBER;
+
+    BEGIN
+        OPEN c1;
+        LOOP
+            FETCH c1 INTO v_id_jucator, v_nume_jucator, v_id_echipa;
+            EXIT WHEN c1%NOTFOUND;
+            DBMS_OUTPUT.PUT_LINE(v_id_jucator || ', ' || v_nume_jucator);
+            OPEN c2(v_id_echipa);
+            FETCH c2 INTO v_total_jucatori;
+            DBMS_OUTPUT.PUT_LINE('are ' || (v_total_jucatori - 1) || ' coechipier(i).');
+            CLOSE c2;
+        END LOOP;
+        CLOSE c1;
+    END;
+    
+    FUNCTION cerinta8(id NUMBER) RETURN NUMBER IS 
+    nr_turnee NUMBER;
+    aux NUMBER;
+    nume_com COMENTATOR.nume%TYPE;
+    v_comentator COMENTATOR%ROWTYPE;
+    WRONG_ID EXCEPTION;
+    NO_TOURNAMENTS EXCEPTION;
+
+BEGIN
+    SELECT COUNT(*) into aux
+    FROM comentator
+    WHERE id_comentator = id;
+    
+    IF aux = 0 THEN
+        RAISE WRONG_ID;
+    END IF;
+        
+    SELECT COUNT(DISTINCT t.id_turneu) into nr_turnee
+    FROM MECI m
+    JOIN COMENTATOR c on m.id_comentator = c.id_comentator
+    JOIN TURNEU t on m.id_turneu = t.id_turneu
+    WHERE m.id_comentator = id;
+    
+    
+    IF nr_turnee = 0 THEN
+        RAISE NO_TOURNAMENTS;
+    END IF;
+    
+    RETURN nr_turnee;
+    
+    EXCEPTION
+        WHEN WRONG_ID THEN
+            DBMS_OUTPUT.PUT_LINE('Niciun comentator nu are acest id');
+            RETURN -1;
+        WHEN NO_TOURNAMENTS THEN
+            DBMS_OUTPUT.PUT_LINE('Comentatorul nu a fost la niciun turneu');
+            RETURN -1;
+    END;
+
+    PROCEDURE cerinta9(id NUMBER)
+AS
+    TYPE vector_id_echipe IS VARRAY(2) OF NUMBER;
+    u vector_id_echipe:= vector_id_echipe();
+    v_sponsor VARCHAR2(50);
+    NO_DATA_FOUND EXCEPTION;
+    TOO_MANY_ROWS EXCEPTION;
+    aux NUMBER;
+    WRONG_ID EXCEPTION;
+    
+    
+BEGIN
+    SELECT COUNT(*) into aux
+    FROM meci
+    WHERE id_meci = id;
+    
+    IF aux = 0 THEN
+        RAISE WRONG_ID;
+    END IF;
+
+
+    FOR rec IN (
+        SELECT DISTINCT j.id_echipa
+        FROM meci m 
+        JOIN jucator_meci jm ON m.id_meci = jm.id_meci
+        JOIN jucator j ON jm.id_jucator1 = j.id_jucator OR jm.id_jucator2 = j.id_jucator
+        WHERE m.id_meci = id
+    ) LOOP
+        u.EXTEND;
+        u(u.LAST) := rec.id_echipa;
+    END LOOP;
+    IF u(u.LAST) IS null THEN
+        RAISE NO_DATA_FOUND;
+        RETURN;
+    END IF;
+    IF u.COUNT > 2 THEN
+        RAISE TOO_MANY_ROWS;
+        RETURN;
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE(u.LAST);
+    DBMS_OUTPUT.PUT_LINE('Pentru meciul ' || id);
+    FOR val in 1..u.COUNT LOOP
+        IF u.COUNT = 1 THEN
+            DBMS_OUTPUT.PUT_LINE('Ambii jucatori fac parte din aceeasi organizatie (' || u(1) || ')');
+            DBMS_OUTPUT.PUT_LINE('Sponsorii prezenti sunt:');
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Echipa jucatorului ' || val || ' (' || u(1) || ') are sponsorii:');
+        END IF;
+        FOR rez IN (SELECT s.nume
+              FROM sponsor s
+              JOIN echipa_sponsor es ON es.id_sponsor = s.id_sponsor
+              JOIN echipa e ON e.id_Echipa = es.id_echipa AND e.id_echipa = u(val))
+        LOOP
+            v_sponsor := rez.nume;
+            DBMS_OUTPUT.PUT_LINE(v_sponsor);
+        END LOOP;
+    END LOOP;
+    
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('no data found');
+        WHEN TOO_MANY_ROWS THEN
+            DBMS_OUTPUT.PUT_LINE('too many rows');
+        WHEN WRONG_ID THEN
+            DBMS_OUTPUT.PUT_LINE('wrong id');
+    
+    END;
+
+    
+END cerinta13;
+/

@@ -1,0 +1,27 @@
+DECLARE
+ v_cod employees.employee_id%TYPE;
+ v_nume employees.last_name%TYPE;
+ v_nr NUMBER(4);
+ v_count NUMBER(4):=0;
+ v_old NUMBER(4):=-1;
+ CURSOR c IS
+ SELECT sef.employee_id cod, MAX(sef.last_name) nume,
+ count(*) nr
+ FROM employees sef, employees ang
+ WHERE ang.manager_id = sef.employee_id
+ GROUP BY sef.employee_id
+ ORDER BY nr DESC;
+BEGIN
+ OPEN c;
+ LOOP
+ FETCH c INTO v_cod,v_nume,v_nr;
+ IF v_nr<>v_old THEN v_count:=v_count+1; v_old:=v_nr;
+ END IF;
+ 
+ EXIT WHEN v_count=4 OR c%NOTFOUND;
+ DBMS_OUTPUT.PUT_LINE('Managerul '|| v_cod ||
+ ' avand numele ' || v_nume ||
+ ' conduce ' || v_nr||' angajati');
+ END LOOP;
+ CLOSE c;
+END;

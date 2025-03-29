@@ -1,0 +1,32 @@
+EXERCITIU 1
+
+SELECT department_name nume 
+    ,COUNT(employee_id) nr
+    ,CASE
+        WHEN COUNT(employee_id)=0
+            THEN 'In departamentul ' || department_name || ' nu lucreaza angajati'
+        WHEN COUNT(employee_id)=1
+            THEN 'In departamentul ' || department_name || ' lucreaza 1 angajat.'
+        WHEN COUNT(employee_id) >= 2
+            THEN 'In departamentul  ' || department_name || ' lucreaza ' || COUNT(employee_id) || ' angajati.' 
+        END AS text
+FROM departments d, employees e
+WHERE d.department_id=e.department_id(+)
+GROUP BY department_name;
+
+EXERCITIU 5
+SELECT *
+FROM 
+    (SELECT sef.employee_id cod, MAX(sef.last_name) nume, COUNT(*) nr
+    FROM employees sef, employees ang
+    WHERE ang.manager_id = sef.employee_id
+    GROUP BY sef.employee_id
+    ORDER BY nr DESC) 
+WHERE ROWNUM < 12;		--stiu ca nu este corect dar pe aceasta baza de data afiseaza bine :D altfel n-am stiut
+
+
+
+
+ 
+
+

@@ -1,0 +1,286 @@
+--------------------EXERCITIU 2
+CREATE OR REPLACE TYPE tip_orase_242 AS VARRAY(10) OF VARCHAR2(20);
+/
+CREATE TABLE excursie_anastasia_242 (cod_excursie NUMBER(4),
+                                    denumire VARCHAR2(20),
+                                    orase tip_orase_242,
+                                    status NUMBER(1));                      
+DECLARE   
+    a tip_orase_242:=tip_orase_242();
+    TYPE vector IS VARRAY(10) OF NUMBER;
+    t vector:= vector();
+    cod NUMBER(4):= &cod;
+    codc NUMBER(4):= &codc;
+    coloana_modificata excursie_anastasia_242%ROWTYPE;
+    nr1 NUMBER(0):=0;
+    nr2 NUMBER(0):=0;
+    oras1 VARCHAR2(20):=& oras1;
+    oras2 VARCHAR2(20):=& oras2;
+    oras3 VARCHAR2(20):=& oras3;
+    aux VARCHAR2(20);
+    min_orase NUMBER:=0;
+BEGIN
+--punctul a
+    a.extend;
+    a(1):='Bucuresti';
+    a.extend;
+    a(2):='Ploiesti';
+    a.extend;
+    a(3):='Timisoara';
+    INSERT INTO excursie_anastasia_242
+    VALUES (1,'SCOALA NR 5',a,1);
+    a(1):='Craiova';
+    a(2):='Slatina';
+    a(3):='Pitesti';
+    a.extend;
+    a(4):='Bucuresti';
+    a.extend;
+    a(5):='Cluj';
+    INSERT INTO excursie_anastasia_242
+    VALUES (2,'SCOALA NR 8',a,1);
+    a(1):='Sibiu';
+    a(2):='Bacau';
+    a(3):='Mures';
+    a(4):='Buzau';
+    INSERT INTO excursie_anastasia_242
+    VALUES (3,'SCOALA NR 9',a,1);
+    a(1):='Botosani';
+    a(2):='Satu Mare';
+    a(3):='Valcea';
+    a(4):='Suceava';
+    INSERT INTO excursie_anastasia_242
+    VALUES (4,'SCOALA NR 10',a,1);
+    a(1):='Domnesti';
+    a(2):='Targu Jiu';
+    a(3):='Valcea';
+    a(4):='Focsani';
+    a(5):='Hunedoara';
+    a.extend;
+    a(6):='Timisoara';
+    INSERT INTO excursie_anastasia_242
+    VALUES (5,'SCOALA NR 11',a,1);
+    --punctul b
+    SELECT * INTO coloana_modificata
+    FROM excursie_anastasia_242
+    WHERE cod_excursie=cod;
+    --adăugați un oraș nou în listă, ce va fi ultimul vizitat în excursia respectivă
+    coloana_modificata.orase.extend;
+    coloana_modificata.orase(coloana_modificata.orase.COUNT):='Brasov';
+    UPDATE excursie_anastasia_242
+    SET orase = coloana_modificata.orase
+    WHERE cod_excursie=cod;
+    --adăugați un oraș nou în listă, ce va fi al doilea oraș vizitat în excursia respectivă  
+    coloana_modificata.orase.extend; 
+    FOR i in coloana_modificata.orase.COUNT..3 LOOP
+        coloana_modificata.orase(i):=coloana_modificata.orase(i-1);
+    END LOOP;
+    coloana_modificata.orase(2):='Oradea';
+    UPDATE excursie_anastasia_242
+    SET orase = coloana_modificata.orase
+    WHERE cod_excursie=cod;
+    --inversați ordinea de vizitare a două dintre orașe al căror nume este specificat;
+    FOR i in coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        IF coloana_modificata.orase(i)=oras1 THEN nr1:=i;
+        END IF;
+    END LOOP; 
+    FOR i in coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        IF coloana_modificata.orase(i)=oras2 THEN nr2:=i;
+        END IF;
+    END LOOP;
+    aux:=coloana_modificata.orase(nr1);
+    coloana_modificata.orase(nr1):=coloana_modificata.orase(nr2);
+    coloana_modificata.orase(nr2):=aux;
+    UPDATE excursie_anastasia_242
+    SET orase = coloana_modificata.orase
+    WHERE cod_excursie=cod;
+    --eliminați din listă un oraș al cărui nume este specificat
+    FOR i in coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        IF coloana_modificata.orase(i)=oras3 THEN nr1:=i;
+        END IF;
+    END LOOP;
+    FOR i in nr1..coloana_modificata.orase.LAST-1 LOOP
+        coloana_modificata.orase(i):=coloana_modificata.orase(i+1);
+    END LOOP;
+    --punctul c
+    --Pentru o excursie al cărui cod este dat, afișați numărul de orașe vizitate, respectiv numele orașelor
+    SELECT * INTO coloana_modificata
+    FROM excursie_anastasia_242
+    WHERE cod_excursie=codc;
+    DBMS_OUTPUT.PUT_LINE (coloana_modificata.orase.COUNT);
+    FOR i IN coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        DBMS_OUTPUT.PUT_LINE (coloana_modificata.orase(i));
+    END LOOP;
+    --punctul d 
+    --Pentru fiecare excursie afișați lista orașelor vizitate
+    FOR i IN 1..5 LOOP   --stiu sigur ca am doar 5 linii in tabel
+        SELECT * INTO coloana_modificata
+        FROM excursie_anastasia_242
+        WHERE cod_excursie=i;  --codurile excursiilor sunt de la 1 la 5
+        IF coloana_modificata.status=1 THEN 
+            FOR j IN coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+                DBMS_OUTPUT.PUT_LINE (coloana_modificata.orase(j));
+            END LOOP;
+        END IF;
+    END LOOP;
+    --punctul e 
+    --Anulați excursiile cu cele mai puține orașe vizitate
+    FOR i IN 1..5 LOOP
+        SELECT * INTO coloana_modificata
+        FROM excursie_anastasia_242
+        WHERE cod_excursie=i;
+        t.extend;
+        t(i):=coloana_modificata.orase.COUNT; 
+    END LOOP; 
+    SELECT min(
+      (SELECT COUNT(*)
+        FROM TABLE(SELECT orase FROM excursie_anastasia_242 T2 WHERE T1.cod_excursie = T2.cod_excursie)))
+        INTO min_orase
+    FROM  excursie_anastasia_242  T1;
+    FOR i IN 1..5 LOOP
+        IF t(i)=min_orase THEN 
+        UPDATE excursie_anastasia_242
+        SET status = 0
+        WHERE cod_excursie=i;
+        END IF;
+    END LOOP;
+END; 
+ --------------------EXERCITIU 3
+ CREATE OR REPLACE TYPE tip_orase_242 IS TABLE OF VARCHAR2(20);
+/
+CREATE TABLE excursie_anastasia_242 (cod_excursie NUMBER(4),
+                                    denumire VARCHAR2(20),
+                                    orase tip_orase_242,
+                                    status NUMBER(1));
+
+DECLARE
+    a tip_orase_242:=tip_orase_242();
+    coloana_modificata excursie_anastasia_242%ROWTYPE;
+    cod NUMBER(4):= &cod;
+    nr1 NUMBER(0):=0;
+    nr2 NUMBER(0):=0;
+    codc NUMBER(4):= &codc;
+    oras1 VARCHAR2(20):=& oras1;
+    oras2 VARCHAR2(20):=& oras2;
+    oras3 VARCHAR2(20):=& oras3;
+    aux VARCHAR2(20);
+    min_orase NUMBER:=0;
+BEGIN
+    --punctul a
+    a.extend;
+    a(1):='Bucuresti';
+    a.extend;
+    a(2):='Timisoara';
+    a.extend;
+    a(3):='Sinaia';
+    INSERT INTO excursie_anastasia_242
+    VALUES (1,'SCOALA NR 5',a,1);
+    a(1):='Craiova';
+    a(2):='Slatina';
+    a(3):='Pitesti';
+    a.extend;
+    a(4):='Bucuresti';
+    a.extend;
+    a(5):='Cluj';
+    INSERT INTO excursie_anastasia_242
+    VALUES (2,'SCOALA NR 8',a,1);
+    a(1):='Sibiu';
+    a(2):='Bacau';
+    a(3):='Mures';
+    a(4):='Buzau';
+    INSERT INTO excursie_anastasia_242
+    VALUES (3,'SCOALA NR 9',a,1);
+    a(1):='Botosani';
+    a(2):='Satu Mare';
+    a(3):='Valcea';
+    a(4):='Suceava';
+    INSERT INTO excursie_anastasia_242
+    VALUES (4,'SCOALA NR 10',a,1);
+    a(1):='Domnesti';
+    a(2):='Targu Jiu';
+    a(3):='Valcea';
+    a(4):='Focsani';
+    a(5):='Hunedoara';
+    a.extend;
+    a(6):='Timisoara';
+    INSERT INTO excursie_anastasia_242
+    VALUES (5,'SCOALA NR 11',a,1);
+    --punctul b
+    SELECT * INTO coloana_modificata
+    FROM excursie_anastasia_242
+    WHERE cod_excursie=cod;
+    --adăugați un oraș nou în listă, ce va fi ultimul vizitat în excursia respectivă
+    coloana_modificata.orase.extend;
+    coloana_modificata.orase(coloana_modificata.orase.COUNT):='Brasov';
+    --adăugați un oraș nou în listă, ce va fi al doilea oraș vizitat în excursia respectivă
+    coloana_modificata.orase.extend;
+    FOR i in coloana_modificata.orase.COUNT..3 LOOP
+        coloana_modificata.orase(i):=coloana_modificata.orase(i-1);
+    END LOOP;
+    coloana_modificata.orase(2):='Oradea';
+    UPDATE excursie_anastasia_242
+    SET orase = coloana_modificata.orase
+    WHERE cod_excursie=cod;
+    --inversați ordinea de vizitare a două dintre orașe al căror nume este specificat;
+    FOR i in coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        IF coloana_modificata.orase(i)=oras1 THEN nr1:=i;
+        END IF;
+    END LOOP;
+    FOR i in coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        IF coloana_modificata.orase(i)=oras2 THEN nr2:=i;
+        END IF;
+    END LOOP;
+    aux:=coloana_modificata.orase(nr1);
+    coloana_modificata.orase(nr1):=coloana_modificata.orase(nr2);
+    coloana_modificata.orase(nr2):=aux;
+    UPDATE excursie_anastasia_242
+    SET orase = coloana_modificata.orase
+    WHERE cod_excursie=cod;
+    --eliminați din listă un oraș al cărui nume este specificat
+    FOR i in coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        IF coloana_modificata.orase(i)=oras3 THEN nr1:=i;
+        END IF;
+    END LOOP;
+    coloana_modificata.orase.DELETE(coloana_modificata.orase.nr1);
+    --punctul c
+    --Pentru o excursie al cărui cod este dat, afișați numărul de orașe vizitate, respectiv numele orașelor
+    SELECT * INTO coloana_modificata
+    FROM excursie_anastasia_242
+    WHERE cod_excursie=codc;
+    DBMS_OUTPUT.PUT_LINE (coloana_modificata.orase.COUNT);
+    FOR i IN coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+        DBMS_OUTPUT.PUT_LINE (coloana_modificata.orase(i));
+    END LOOP;
+    --punctul d
+    --Pentru fiecare excursie afișați lista orașelor vizitate
+    FOR i IN 1..5 LOOP   --stiu sigur ca am doar 5 linii in tabel
+        SELECT * INTO coloana_modificata
+        FROM excursie_anastasia_242
+        WHERE cod_excursie=i;  --codurile excursiilor sunt de la 1 la 5
+        IF coloana_modificata.status=1 THEN
+            FOR j IN coloana_modificata.orase.FIRST..coloana_modificata.orase.LAST LOOP
+                DBMS_OUTPUT.PUT_LINE (coloana_modificata.orase(j));
+            END LOOP;
+        END IF;
+    END LOOP;
+    --punctul e
+    --Anulați excursiile cu cele mai puține orașe vizitate
+    FOR i IN 1..5 LOOP
+        SELECT * INTO coloana_modificata
+        FROM excursie_anastasia_242
+        WHERE cod_excursie=i;
+        t.extend;
+        t(i):=coloana_modificata.orase.COUNT;
+    END LOOP;
+    SELECT min(
+      (SELECT COUNT(*)
+        FROM TABLE(SELECT orase FROM excursie_anastasia_242 T2 WHERE T1.cod_excursie = T2.cod_excursie)))
+        INTO min_orase
+    FROM  excursie_anastasia_242  T1;
+    FOR i IN 1..5 LOOP
+        IF t(i)=min_orase THEN
+        UPDATE excursie_anastasia_242
+        SET status = 0
+        WHERE cod_excursie=i;
+        END IF;
+    END LOOP;
+END;

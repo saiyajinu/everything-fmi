@@ -1,0 +1,78 @@
+E1:
+DECLARE 
+    name employees.first_name%type;
+    salary employees.salary%type;
+    title jobs.job_title%type;
+    title_two jobs.job_title%type;
+    CURSOR c IS
+    SELECT job_title,first_name,salary 
+    FROM  employees e
+    RIGHT JOIN jobs j ON e.job_id=j.job_id; 
+BEGIN
+    OPEN c;
+    LOOP
+    FETCH c INTO title,name,salary;
+    EXIT WHEN c%NOTFOUND; 
+        DBMS_OUTPUT.PUT_LINE(title); 
+        DBMS_OUTPUT.PUT_LINE(name || ' ' || salary);
+            LOOP
+            FETCH c INTO title_two,name,salary;
+            EXIT WHEN title_two!=title; 
+                DBMS_OUTPUT.PUT_LINE(name || ' ' || salary);
+            END LOOP;
+    END LOOP;
+    CLOSE c;
+END;
+
+
+E2:
+DECLARE 
+    name employees.first_name%type;
+    salary employees.salary%type;
+    title jobs.job_title%type;
+    title_two jobs.job_title%type;
+    empNo NUMBER(3):= 0;
+    totalIncome NUMBER(10):= 0; 
+    avgIncome NUMBER(10):= 0; 
+    income NUMBER(10):= 0;
+    comission employees.commission_pct%TYPE;
+    CURSOR c IS
+    SELECT job_title,first_name,salary,commission_pct 
+    FROM  employees e
+    RIGHT JOIN jobs j ON e.job_id=j.job_id; 
+BEGIN
+    OPEN c;
+    LOOP
+    empNo:= 0;
+    totalIncome:= 0;  
+    FETCH c INTO title,name,salary,comission;
+    empNo:=empNo+1;
+    IF comission IS NOT NULL
+    THEN 
+        income:= salary + comission * salary;
+    ELSE 
+        income:= salary;
+    END IF;
+    totalIncome:= totalIncome + income;   
+    EXIT WHEN c%NOTFOUND; 
+        DBMS_OUTPUT.PUT_LINE(title);  
+        DBMS_OUTPUT.PUT_LINE(name || ' ' || salary);
+            LOOP
+            FETCH c INTO title_two,name,salary,comission;
+            EXIT WHEN title_two!=title; 
+                empNo:=empNo+1;
+                IF comission IS NOT NULL
+                THEN 
+                    income:= salary + comission * salary;
+                ELSE 
+                    income:= salary;
+                END IF;
+                DBMS_OUTPUT.PUT_LINE(name || ' ' || salary);
+                totalIncome:= totalIncome + income; 
+            END LOOP;
+            avgIncome:= totalIncome / empNo;
+            DBMS_OUTPUT.PUT_LINE(empNo || ' ' || totalIncome || ' ' ||  avgIncome); 
+    END LOOP;
+    CLOSE c;
+END;
+

@@ -161,9 +161,10 @@ r=Retea("sezon_ploios.txt")
 rez=r.interogare_retea(r.interogare)
 rez_fals=1-rez
 #print(str(r))
-print(f"Pentru {r.interogare} probabilitatea să fie:\n" + \
-       f"- True este {rez}\n" + \
-       f"- False este {rez_fals}")
+print(f"Pentru {r.interogare} probabilitatea sa fie:\n"
+      f"- True este {rez}\n"
+      f"- False este {rez_fals}")
+
                 
                 
                 

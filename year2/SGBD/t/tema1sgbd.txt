@@ -1,0 +1,20 @@
+11
+COMMENT ON TABLE employees IS 'Informaţiidespre angajati';
+
+12
+SELECT * from user_tab_comments;
+
+13
+ALTER SESSION SET NLS_DATE_FORMAT = 'DD-MM-YYYY HH24:MI:SS';
+
+14
+SELECT EXTRACT(YEAR FROM SYSDATE)
+FROM   dual;
+
+15
+SELECT EXTRACT(DAY FROM SYSDATE),EXTRACT(MONTH FROM SYSDATE)
+FROM   dual;
+
+16
+SELECT table_name
+FROM user_tables;

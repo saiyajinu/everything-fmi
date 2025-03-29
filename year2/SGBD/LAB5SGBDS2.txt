@@ -1,0 +1,38 @@
+
+
+declare
+TYPE v_manager_242 is varray(10) of NUMBER(6,0);
+ v  v_manager_242;
+p subordonati_242:=subordonati_242();
+nume varchar(20);
+begin
+--7
+select manager_id 
+bulk collect into v
+from    (select manager_id
+        from employees
+        group by manager_id)
+where rownum<=3;
+--13
+
+for i in v.first..v.last loop
+    DBMS_OUTPUT.PUT_LINE(v(i));
+    p.delete;
+   select employee_id 
+   bulk collect into p 
+   from employees
+   where manager_id=v(i) and rownum<10;
+   select first_name
+   into nume
+   from employees
+   where employee_id=v(i);
+   insert into manageri_242 values (v(i), nume, p);
+end loop;
+
+end;
+/
+
+select *
+from manageri_242
+
+

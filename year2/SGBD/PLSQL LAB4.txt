@@ -1,0 +1,46 @@
+create table zile_242(id number(2) PRIMARY KEY, data DATE, nume_zi varchar(10));
+DECLARE
+  contor number(3) := 1;
+  v_data date;
+  maxim  number(2) := last_day(sysdate) - sysdate;
+BEGIN
+  LOOP
+    v_data := sysdate + contor;
+    insert into zile_242 values(contor, v_data, to_char(v_data, 'Day'));
+    contor := contor + 1;
+    EXIT WHEN contor > maxim;
+  END LOOP;
+  
+
+  
+  
+END;
+/
+select *
+from zile_242;
+
+  select w.start_work, count(*)
+  from work  w
+  inner join zile_242 z on z.data=w.start_work
+  group by start_work
+
+drop table zile_242;
+
+DECLARE
+    lastDay number(2) := EXTRACT(DAY from LAST_DAY(SYSDATE));
+    numberPorjects number(2);
+--    firstDate DATE := 1 + LAST_DAY(SYSDATE)
+BEGIN
+
+    FOR contor in 1..lastDay LOOP
+        
+        select count(*)
+        into numberPorjects
+        from work
+        where extract(day from start_work)=contor and extract(month from start_work)=extract(month from sysdate); 
+        DBMS_OUTPUT.PUT_LINE(contor||'  '||numberPorjects);
+        
+    END LOOP;
+END;
+
+

@@ -1,0 +1,1313 @@
+-----------LABORATORUL 8
+----------------EX 1.
+
+CREATE TABLE info_anastasia_242( 
+    utilizator  VARCHAR2(100),
+    data        DATE,
+    comanda     VARCHAR2(100),
+    nr_linii    NUMBER(5),
+    eroare      VARCHAR2(100));
+/
+
+---------------EX 2.
+
+CREATE OR REPLACE TYPE f2_return AS VARRAY(10) OF NUMBER(10);
+/
+
+CREATE OR REPLACE FUNCTION f2(v_nume employees.last_name%TYPE DEFAULT 'Bell')
+RETURN f2_return 
+IS 
+f2_raspuns f2_return;
+BEGIN
+    f2_raspuns := f2_return(0,0);
+    SELECT COUNT(*) INTO f2_raspuns(1)
+    FROM employees
+    WHERE last_name = v_nume;
+    SELECT salary INTO f2_raspuns(2)
+    FROM employees
+    WHERE last_name = v_nume;
+    RETURN f2_raspuns;
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE_APPLICATION_ERROR(-20000, 'Nu exista angajati cu numele dat');
+    WHEN TOO_MANY_ROWS THEN
+        RAISE_APPLICATION_ERROR(-20001,'Exista mai multi angajati cu numele dat');
+    WHEN OTHERS THEN
+        RAISE_APPLICATION_ERROR(-20002,'Alta eroare!');
+END f2;
+/
+
+DECLARE 
+    f2_res f2_return;
+    f2_nr         info_anastasia_242.nr_linii%TYPE ;
+    f2_eroare         info_anastasia_242.eroare%TYPE;
+    f2_utilizator  info_anastasia_242.utilizator%TYPE;
+    f2_comanda info_anastasia_242.comanda%TYPE;
+BEGIN  
+    SELECT user INTO f2_utilizator FROM dual;
+    f2_res := f2();
+    IF f2_res(1) = 1 THEN 
+        f2_nr := 1;
+        f2_eroare := 'Nicio eroare';
+        f2_comanda := 'Select';
+    ELSIF f2_res(1) > 1 THEN
+        f2_nr :=f2_res(1);
+        f2_eroare := 'Niciuna';
+        f2_comanda := 'Select';
+    ELSIF f2_res(1) = 0 THEN 
+        f2_nr := 0;
+        f2_eroare := 'Nicio eroare';
+        f2_comanda := 'Nicio comanda';
+    END IF;
+    INSERT INTO info_anastasia_242 VALUES (
+        f2_utilizator,
+        sysdate,
+        f2_comanda,
+        f2_nr,
+        f2_eroare
+    ); 
+END;
+/
+
+DECLARE                 --am apelat functia pentru print
+    f2_res f2_return; 
+BEGIN
+    f2_res := f2();
+    DBMS_OUTPUT.PUT_LINE('Nr de angajati cu numele dat este '|| f2_res(1));
+    DBMS_OUTPUT.PUT_LINE('Salariul este '|| f2_res(2));
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE p2(v_nume employees.last_name%TYPE)
+IS
+salariu employees.salary%TYPE;
+p2_nr         info_anastasia_242.nr_linii%TYPE ;
+p2_eroare         info_anastasia_242.eroare%TYPE;
+p2_utilizator  info_anastasia_242.utilizator%TYPE;
+p2_comanda info_anastasia_242.comanda%TYPE;
+BEGIN 
+    SELECT COUNT(*) INTO p2_nr
+    FROM employees
+    WHERE last_name = v_nume;
+
+    SELECT salary INTO salariu
+    FROM employees
+    WHERE last_name = v_nume;
+    
+    SELECT user INTO p2_utilizator FROM dual;
+    
+    DBMS_OUTPUT.PUT_LINE('Salariul este '|| salariu);
+    IF p2_nr = 1 THEN  
+        p2_eroare := 'Nicio eroare';
+        p2_comanda := 'Select';
+    ELSIF p2_nr > 1 THEN 
+        p2_eroare := 'Niciuna';
+        p2_comanda := 'Select';
+    ELSIF p2_nr = 0 THEN  
+        p2_eroare := 'Nicio eroare';
+        p2_comanda := 'Nicio comanda';
+    END IF;
+    INSERT INTO info_anastasia_242 VALUES (
+        p2_utilizator,
+        sysdate,
+        p2_comanda,
+        p2_nr,
+        p2_eroare
+    ); 
+END p2;
+/
+
+-----------------------EX 3.
+
+--------METODA 1
+
+CREATE OR REPLACE FUNCTION f3 
+    (oras locations.city%TYPE)
+RETURN NUMBER IS
+    f3_nr         info_anastasia_242.nr_linii%TYPE ;
+    f3_eroare         info_anastasia_242.eroare%TYPE;
+    f3_utilizator  info_anastasia_242.utilizator%TYPE;
+    f3_comanda info_anastasia_242.comanda%TYPE;
+BEGIN
+    SELECT user INTO f3_utilizator FROM dual;
+    IF oras IS NULL THEN
+        f3_comanda := 'Nicio comanda';
+        f3_nr := 0;
+        f3_eroare := 'Orasul nu exista';
+        INSERT INTO info_anastasia_242 VALUES (
+            f3_utilizator,
+            sysdate,
+            f3_comanda,
+            f3_nr,
+            f3_eroare
+        ); 
+    END IF;
+    SELECT COUNT(*)
+    INTO f3_nr
+    FROM employees e
+    JOIN departments d ON (e.department_id = d.department_id)
+    JOIN locations l ON (l.location_id = d.location_id)
+    WHERE
+        (SELECT COUNT(*) 
+        FROM job_history 
+        WHERE employee_id = e.employee_id ) >= 2;
+    IF f3_nr = 0 THEN
+        f3_comanda := 'Nicio comanda'; 
+        f3_eroare := 'Niciun angajat gasit';
+    END IF;
+    INSERT INTO info_anastasia_242 VALUES (
+        f3_utilizator,
+        sysdate,
+        f3_comanda,
+        f3_nr,
+        f3_eroare
+    );
+    RETURN f3_nr;
+END;
+
+-----METODA 2
+
+CREATE OR REPLACE FUNCTION f3 
+    (oras locations.city%TYPE)
+RETURN NUMBER IS
+    f3_nr info_anastasia_242.nr_linii%TYPE ;
+BEGIN 
+    IF oras IS NULL THEN 
+        f3_nr := 0;  
+        RETURN -1;
+    END IF;
+    SELECT COUNT(*)
+    INTO f3_nr
+    FROM employees e
+    JOIN departments d ON (e.department_id = d.department_id)
+    JOIN locations l ON (l.location_id = d.location_id)
+    WHERE
+        (SELECT COUNT(*) 
+        FROM job_history 
+        WHERE employee_id = e.employee_id ) >= 2;
+    IF f3_nr = 0 THEN
+        RETURN 0;
+    END IF;
+    RETURN f3_nr;
+END;
+
+DECLARE 
+    f3_eroare info_anastasia_242.eroare%TYPE;
+    f3_utilizator  info_anastasia_242.utilizator%TYPE;
+    f3_comanda info_anastasia_242.comanda%TYPE;
+BEGIN
+    SELECT user INTO f3_utilizator FROM dual;
+    f3_comanda := 'Select';
+    IF f3('slatina') = -1 THEN 
+        f3_comanda := 'Nicio comanda'; 
+        f3_eroare := 'Orasul nu exista';
+    ELSIF f3('slatina') = 0 THEN 
+        f3_comanda := 'Nicio comanda'; 
+        f3_eroare := 'Niciun angajat gasit';
+    END IF;
+    INSERT INTO info_anastasia_242 VALUES (
+        f3_utilizator,
+        sysdate,
+        f3_comanda,
+        f3('slatina'),
+        f3_eroare
+    ); 
+END;
+/
+ 
+------------------EX 4. 
+
+CREATE OR REPLACE TYPE p4_return AS VARRAY(100) OF NUMBER(6,0);
+/
+
+CREATE OR REPLACE PROCEDURE
+p4 (man_id IN employees.manager_id%TYPE,
+    p4_res OUT p4_return) IS 
+    p4_nr         info_anastasia_242.nr_linii%TYPE ;
+    p4_eroare         info_anastasia_242.eroare%TYPE;
+    p4_utilizator  info_anastasia_242.utilizator%TYPE;
+    p4_comanda info_anastasia_242.comanda%TYPE;
+    OK BOOLEAN:= FALSE;
+BEGIN
+    SELECT user INTO p4_utilizator FROM dual;
+    IF man_id IS NULL THEN 
+        p4_nr:= 0;
+        p4_eroare:= 'Managerul nu exista';
+        p4_comanda:= 'Nicio comanda';
+        OK :=TRUE;
+    END IF;
+    SELECT employee_id BULK COLLECT INTO p4_res
+    FROM employees
+    WHERE manager_id = man_id; 
+    
+    FOR i IN p4_res.FIRST..p4_res.LAST LOOP
+        UPDATE employees SET salary = salary + ( 10 * salary ) / 100
+        WHERE employee_id = p4_res(i);
+    END LOOP;
+    IF OK = FALSE THEN 
+        p4_nr := p4_res.COUNT;
+        p4_eroare := 'Nicio eroare';
+        p4_comanda := 'Update';
+    END IF;
+    INSERT INTO info_anastasia_242 VALUES (
+        p4_utilizator,
+        sysdate,
+        p4_comanda,
+        p4_nr,
+        p4_eroare
+    ); 
+END p4;
+/
+
+
+--apelare 
+DECLARE
+res p4_return;
+BEGIN
+    p4(100,res);
+    FOR i IN res.FIRST..res.LAST LOOP
+        DBMS_OUTPUT.PUT_LINE(res(i)); 
+    END LOOP;
+END;
+/
+
+
+------------------EX 5.
+
+CREATE OR REPLACE TYPE return_nume AS VARRAY(100) OF VARCHAR2(20);
+/
+CREATE OR REPLACE TYPE return_vechime AS VARRAY(100) OF NUMBER(3);
+/
+CREATE OR REPLACE TYPE return_salariu AS VARRAY(100) OF NUMBER(8,2);
+/
+
+DECLARE 
+    TYPE DepartamentOutput IS RECORD ( 
+        -- zi ----------------??? nu am stiut de ce tip sa declar zi
+	nume_departament departments.department_name%TYPE,
+        res_nume return_nume,
+        res_vechime return_vechime,
+        res_salariu return_salariu
+    );
+    TYPE departament_array IS TABLE OF DepartamentOutput INDEX BY BINARY_INTEGER;
+    departament_records departament_array;
+    PROCEDURE p5 (departament_records OUT departament_array) IS
+    data job_history.start_date%TYPE;
+    BEGIN
+          ------------------
+    END p5;
+BEGIN
+    p4(departament_records);
+    
+    FOR i IN departament_records.FIRST..departament_records.LAST LOOP
+        DBMS_OUTPUT.PUT_LINE('Departamentul este ' || departament_records(i).nume_departament || 'Ziua cu cele mai multe angajari este ' || departament_records(i).zi);
+	DBMS_OUTPUT.PUT_LINE('Numele angajatilor este : ')
+	FOR j in departament_records(i).res_nume.FIRST..departament_records(i).res_nume.LAST LOOP 
+	    DBMS_OUTPUT.PUT_LINE(departament_records(i).res_nume(j));
+	END LOOP;
+	DBMS_OUTPUT.PUT_LINE('Vechimea angajatilor este : ')
+	FOR j in departament_records(i).res_vechime.FIRST..departament_records(i).res_vechime.LAST LOOP 
+	    DBMS_OUTPUT.PUT_LINE(departament_records(i).res_vechime(j));
+	END LOOP;
+	DBMS_OUTPUT.PUT_LINE('Salariul angajatilor este : ')
+	FOR j in departament_records(i).res_salariu.FIRST..departament_records(i).res_salariu.LAST LOOP 
+	    DBMS_OUTPUT.PUT_LINE(departament_records(i).res_salariu(j));
+	END LOOP; 
+    END LOOP;
+END;
+
+------cerinta 
+Definiți un subprogram care obține pentru fiecare nume de departament ziua din săptămână în
+care au fost angajate cele mai multe persoane, lista cu numele acestora, vechimea și venitul lor
+lunar. 
+
+Inauntru procedurii p4 nu am stiut exact cum sa implementez cerinta 
+M-am gandit sa fac cu vectorul de record-uri si cu un cursor dar nu mi-a iesit query-ul
+Am gasit ceva ajutator pe net si am adaptat la codul meu :
+SELECT * 
+FROM job_history
+WHERE TO_CHAR(START_DATE,'DAY') in
+    (SELECT TO_CHAR(START_DATE,'DAY') DAY
+    FROM job_history
+    GROUP BY TO_CHAR(START_DATE,'DAY')
+    HAVING COUNT ()=(SELECT MAX(COUNT())
+                    FROM job_history 
+                    GROUP BY TO_CHAR(START_DATE,'DAY')));
+dar mai departe nu am stiut cum sa fac :D
+
+
+-----------------------LABORATORUL 9
+EXERCITIU 1
+--------------------------------a)
+
+CREATE SEQUENCE employee_id_secventa
+    INCREMENT BY 10
+    START  WITH 10
+    MAXVALUE 100;
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    END pachet1;
+/
+CREATE OR REPLACE PACKAGE BODY pachet1 IS 
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN NUMBER is 
+    salariu employees.salary%TYPE;
+    BEGIN
+        SELECT MIN(salary) 
+        INTO salariu 
+        FROM employees 
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN salariu;    --10
+    END salariu_adaugare;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER IS 
+    id_manager employees.manager_id%TYPE;
+    BEGIN
+        SELECT employee_id 
+        INTO id_manager 
+        FROM employees 
+        WHERE first_name = nume AND last_name = prenume;
+        RETURN id_manager;
+    END id_manager_adaugare;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER IS
+    id_department departments.department_id%TYPE;   --24
+    BEGIN
+        SELECT department_id
+        INTO id_department
+        FROM departments 
+        WHERE department_name = nume_dep;
+        RETURN id_department;
+    END id_department_adaugare;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER is
+        id_job jobs.job_id%TYPE;
+    BEGIN
+        SELECT job_id
+        INTO id_job
+        FROM jobs
+        WHERE job_title = nume_job;
+        RETURN id_job;         --40
+    END id_job_adaugare;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%type, nume_job jobs.job_title%TYPE)
+    IS 
+        salariu employees.salary%TYPE;
+        id_manager employees.employee_id%TYPE; 
+        id_department departments.department_id%TYPE;
+        id_job jobs.job_title%TYPE;
+    BEGIN      --50
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu := salariu_adaugare(id_department, id_job); 
+        INSERT INTO employees VALUES (
+            employee_id_secventa.NEXTVAL,
+            nume, 
+            prenume, 
+            email, 
+            telefon, 
+            sysdate,
+            id_job,
+            salariu, 
+            0,
+            id_manager,
+            id_department);
+    END angajat_adaugare; 
+END pachet1;
+
+-----------------------------------b)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%TYPE, nume_manager employees.last_name%TYPE, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+END pachet1;
+/
+CREATE OR REPLACE PACKAGE BODY pachet1 IS 
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN NUMBER is 
+    salariu employees.salary%TYPE;
+    BEGIN
+        SELECT MIN(salary) 
+        INTO salariu 
+        FROM employees 
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN salariu;    --10
+    END salariu_adaugare;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER IS 
+    id_manager employees.manager_id%TYPE;
+    BEGIN
+        SELECT employee_id 
+        INTO id_manager 
+        FROM employees 
+        WHERE first_name = nume AND last_name = prenume;
+        RETURN id_manager;
+    END id_manager_adaugare;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER IS
+    id_department departments.department_id%TYPE;   --24
+    BEGIN
+        SELECT department_id
+        INTO id_department
+        FROM departments 
+        WHERE department_name = nume_dep;
+        RETURN id_department;
+    END id_department_adaugare;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER is
+        id_job jobs.job_id%TYPE;
+    BEGIN
+        SELECT job_id
+        INTO id_job
+        FROM jobs
+        WHERE job_title = nume_job;
+        RETURN id_job;         --40
+    END id_job_adaugare;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%type, nume_job jobs.job_title%TYPE)
+    IS 
+        salariu employees.salary%TYPE;
+        id_manager employees.employee_id%TYPE; 
+        id_department departments.department_id%TYPE;
+        id_job jobs.job_title%TYPE;
+    BEGIN      --50
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu := salariu_adaugare(id_department, id_job); 
+        INSERT INTO employees VALUES (
+            employee_id_secventa.NEXTVAL,
+            nume, 
+            prenume, 
+            email, 
+            telefon, 
+            sysdate,
+            id_job,
+            salariu, 
+            0,
+            id_manager,
+            id_department);
+    END angajat_adaugare;
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE IS
+    comision   employees.commission_pct%TYPE;   --70
+    BEGIN
+        SELECT min(commission_pct)
+        INTO comision 
+        FROM employees
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN comision;
+    END comision_adaugare;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%TYPE,nume_manager employees.last_name%TYPE, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE)
+    IS                                                                      --80
+    id_angajat employees.employee_id%TYPE;
+    salariu_dep_nou employees.salary%TYPE;
+    salariu_dep_vechi employees.salary%TYPE;
+    comision employees.commission_pct%type;
+    id_manager employees.employee_id%TYPE; 
+    id_department departments.department_id%TYPE;
+    id_job jobs.job_title%TYPE;
+    BEGIN 
+        SELECT salary, employee_id
+        INTO salariu_dep_vechi, id_angajat    --90
+        FROM employees
+        WHERE last_name = nume AND first_name = prenume;
+        
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu_dep_nou :=salariu_adaugare(id_department,id_job);
+        comision := comision_adaugare(id_department, id_job);
+        
+        IF salariu_dep_nou > salariu_dep_vechi THEN    --100
+            salariu_dep_nou := salariu_dep_vechi;
+        END IF;
+        UPDATE employees 
+        SET hire_date = sysdate, job_id = id_job, salary = salariu_dep_nou, commission_pct = comision, manager_id = id_manager, department_id = id_department
+        WHERE employee_id = id_angajat;
+    END angajat_mutare;
+END pachet1;
+
+-----------------------------c)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%TYPE, nume_manager employees.last_name%TYPE, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION nr_subalterni(nume employees.last_name%type, prenume employees.first_name%type)
+    RETURN NUMBER;
+END pachet1;
+/
+CREATE OR REPLACE PACKAGE BODY pachet1 IS 
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN NUMBER is 
+    salariu employees.salary%TYPE;
+    BEGIN
+        SELECT MIN(salary) 
+        INTO salariu 
+        FROM employees 
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN salariu;    --10
+    END salariu_adaugare;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER IS 
+    id_manager employees.manager_id%TYPE;
+    BEGIN
+        SELECT employee_id 
+        INTO id_manager 
+        FROM employees 
+        WHERE first_name = nume AND last_name = prenume;
+        RETURN id_manager;
+    END id_manager_adaugare;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER IS
+    id_department departments.department_id%TYPE;   --24
+    BEGIN
+        SELECT department_id
+        INTO id_department
+        FROM departments 
+        WHERE department_name = nume_dep;
+        RETURN id_department;
+    END id_department_adaugare;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER is
+        id_job jobs.job_id%TYPE;
+    BEGIN
+        SELECT job_id
+        INTO id_job
+        FROM jobs
+        WHERE job_title = nume_job;
+        RETURN id_job;         --40
+    END id_job_adaugare;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%type, nume_job jobs.job_title%TYPE)
+    IS 
+        salariu employees.salary%TYPE;
+        id_manager employees.employee_id%TYPE; 
+        id_department departments.department_id%TYPE;
+        id_job jobs.job_title%TYPE;
+    BEGIN      --50
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu := salariu_adaugare(id_department, id_job); 
+        INSERT INTO employees VALUES (
+            employee_id_secventa.NEXTVAL,
+            nume, 
+            prenume, 
+            email, 
+            telefon, 
+            sysdate,
+            id_job,
+            salariu, 
+            0,
+            id_manager,
+            id_department);
+    END angajat_adaugare;
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE IS
+    comision   employees.commission_pct%TYPE;   --70
+    BEGIN
+        SELECT min(commission_pct)
+        INTO comision 
+        FROM employees
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN comision;
+    END comision_adaugare;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%TYPE,nume_manager employees.last_name%TYPE, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE)
+    IS                                                                      --80
+    id_angajat employees.employee_id%TYPE;
+    salariu_dep_nou employees.salary%TYPE;
+    salariu_dep_vechi employees.salary%TYPE;
+    comision employees.commission_pct%type;
+    id_manager employees.employee_id%TYPE; 
+    id_department departments.department_id%TYPE;
+    id_job jobs.job_title%TYPE;
+    BEGIN 
+        SELECT salary, employee_id
+        INTO salariu_dep_vechi, id_angajat    --90
+        FROM employees
+        WHERE last_name = nume AND first_name = prenume;
+        
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu_dep_nou :=salariu_adaugare(id_department,id_job);
+        comision := comision_adaugare(id_department, id_job);
+        
+        IF salariu_dep_nou > salariu_dep_vechi THEN    --100
+            salariu_dep_nou := salariu_dep_vechi;
+        END IF;
+        UPDATE employees 
+        SET hire_date = sysdate, job_id = id_job, salary = salariu_dep_nou, commission_pct = comision, manager_id = id_manager, department_id = id_department
+        WHERE employee_id = id_angajat;
+    END angajat_mutare;
+    FUNCTION nr_subalterni(nume employees.last_name%type, prenume employees.first_name%type)
+    RETURN NUMBER IS
+    nr NUMBER; 
+    BEGIN
+        SELECT COUNT(*)
+        INTO nr 
+        FROM employees e
+        JOIN employees m ON e.manager_id = m.employee_id
+        WHERE m.first_name = prenume AND m.last_name = nume;
+       
+        RETURN nr;
+    END nr_subalterni;
+    
+END pachet1;
+
+----------------------------d)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type, nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE);
+END pachet1;
+/
+CREATE OR REPLACE PACKAGE BODY pachet1 IS 
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN NUMBER is 
+    salariu employees.salary%TYPE;
+    BEGIN
+        SELECT MIN(salary) 
+        INTO salariu 
+        FROM employees 
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN salariu;    --10
+    END salariu_adaugare;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER IS 
+    id_manager employees.manager_id%TYPE;
+    BEGIN
+        SELECT employee_id 
+        INTO id_manager 
+        FROM employees 
+        WHERE first_name = nume AND last_name = prenume;
+        RETURN id_manager;
+    END id_manager_adaugare;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER IS
+    id_department departments.department_id%TYPE;   --24
+    BEGIN
+        SELECT department_id
+        INTO id_department
+        FROM departments 
+        WHERE department_name = nume_dep;
+        RETURN id_department;
+    END id_department_adaugare;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER is
+        id_job jobs.job_id%TYPE;
+    BEGIN
+        SELECT job_id
+        INTO id_job
+        FROM jobs
+        WHERE job_title = nume_job;
+        RETURN id_job;         --40
+    END id_job_adaugare;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%type, nume_job jobs.job_title%TYPE)
+    IS 
+        salariu employees.salary%TYPE;
+        id_manager employees.employee_id%TYPE; 
+        id_department departments.department_id%TYPE;
+        id_job jobs.job_title%TYPE;
+    BEGIN      --50
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu := salariu_adaugare(id_department, id_job); 
+        INSERT INTO employees VALUES (
+            employee_id_secventa.NEXTVAL,
+            nume, 
+            prenume, 
+            email, 
+            telefon, 
+            sysdate,
+            id_job,
+            salariu, 
+            0,
+            id_manager,
+            id_department);
+    END angajat_adaugare;
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE IS
+    comision   employees.commission_pct%TYPE;   --70
+    BEGIN
+        SELECT min(commission_pct)
+        INTO comision 
+        FROM employees
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN comision;
+    END comision_adaugare;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type,nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE)
+    IS                                                                      --80
+    id_angajat employees.employee_id%TYPE;
+    salariu_dep_nou employees.salary%TYPE;
+    salariu_dep_vechi employees.salary%TYPE;
+    comision employees.commission_pct%type;
+    id_manager employees.employee_id%TYPE; 
+    id_department departments.department_id%TYPE;
+    id_job jobs.job_title%TYPE;
+    BEGIN 
+        SELECT salary, employee_id
+        INTO salariu_dep_vechi, id_angajat    --90
+        FROM employees
+        WHERE last_name = nume AND first_name = prenume;
+        
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu_dep_nou :=salariu_adaugare(id_department,id_job);
+        comision := comision_adaugare(id_department, id_job);
+        
+        IF salariu_dep_nou > salariu_dep_vechi THEN    --100
+            salariu_dep_nou := salariu_dep_vechi;
+        END IF;
+        UPDATE employees 
+        SET hire_date = sysdate, job_id = id_job, salary = salariu_dep_nou, commission_pct = comision, manager_id = id_manager, department_id = id_department
+        WHERE employee_id = id_angajat;
+    END angajat_mutare;
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER IS
+    nr NUMBER; 
+    BEGIN
+        SELECT COUNT(*)                         --doar directi
+        INTO nr 
+        FROM employees e
+        JOIN employees m ON e.manager_id = m.employee_id
+        WHERE m.first_name = prenume AND m.last_name = nume;
+       
+        RETURN nr;
+    END nr_subalterni;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE) IS
+    id_primul_manager employees.manager_id%TYPE;
+    id_managerul_managerului employees.manager_id%TYPE;
+    BEGIN
+        SELECT manager_id
+        INTO id_primul_manager
+        FROM employees
+        WHERE employee_id = id_angajat;
+        
+        SELECT manager_id
+        INTO id_managerul_managerului
+        FROM employees
+        WHERE employee_id = id_primul_manager;
+       
+        UPDATE employees
+        SET manager_id = id_managerul_managerului
+        WHERE employee_id = id_angajat;  
+    END promovare;
+    
+END pachet1;
+
+--------------------------------e)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type, nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE);
+    PROCEDURE salariu_actualizare(salariu_nou employees.salary%TYPE, nume employees.first_name%TYPE);
+END pachet1;
+/
+CREATE OR REPLACE PACKAGE BODY pachet1 IS 
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN NUMBER is 
+    salariu employees.salary%TYPE;
+    BEGIN
+        SELECT MIN(salary) 
+        INTO salariu 
+        FROM employees 
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN salariu;    --10
+    END salariu_adaugare;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER IS 
+    id_manager employees.manager_id%TYPE;
+    BEGIN
+        SELECT employee_id 
+        INTO id_manager 
+        FROM employees 
+        WHERE first_name = nume AND last_name = prenume;
+        RETURN id_manager;
+    END id_manager_adaugare;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER IS
+    id_department departments.department_id%TYPE;   --24
+    BEGIN
+        SELECT department_id
+        INTO id_department
+        FROM departments 
+        WHERE department_name = nume_dep;
+        RETURN id_department;
+    END id_department_adaugare;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER is
+        id_job jobs.job_id%TYPE;
+    BEGIN
+        SELECT job_id
+        INTO id_job
+        FROM jobs
+        WHERE job_title = nume_job;
+        RETURN id_job;         --40
+    END id_job_adaugare;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%type, nume_job jobs.job_title%TYPE)
+    IS 
+        salariu employees.salary%TYPE;
+        id_manager employees.employee_id%TYPE; 
+        id_department departments.department_id%TYPE;
+        id_job jobs.job_title%TYPE;
+    BEGIN      --50
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu := salariu_adaugare(id_department, id_job); 
+        INSERT INTO employees VALUES (
+            employee_id_secventa.NEXTVAL,
+            nume, 
+            prenume, 
+            email, 
+            telefon, 
+            sysdate,
+            id_job,
+            salariu, 
+            0,
+            id_manager,
+            id_department);
+    END angajat_adaugare;
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE IS
+    comision   employees.commission_pct%TYPE;   --70
+    BEGIN
+        SELECT min(commission_pct)
+        INTO comision 
+        FROM employees
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN comision;
+    END comision_adaugare;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type,nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE)
+    IS                                                                      --80
+    id_angajat employees.employee_id%TYPE;
+    salariu_dep_nou employees.salary%TYPE;
+    salariu_dep_vechi employees.salary%TYPE;
+    comision employees.commission_pct%type;
+    id_manager employees.employee_id%TYPE; 
+    id_department departments.department_id%TYPE;
+    id_job jobs.job_title%TYPE;
+    BEGIN 
+        SELECT salary, employee_id
+        INTO salariu_dep_vechi, id_angajat    --90
+        FROM employees
+        WHERE last_name = nume AND first_name = prenume;
+        
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu_dep_nou :=salariu_adaugare(id_department,id_job);
+        comision := comision_adaugare(id_department, id_job);
+        
+        IF salariu_dep_nou > salariu_dep_vechi THEN    --100
+            salariu_dep_nou := salariu_dep_vechi;
+        END IF;
+        UPDATE employees 
+        SET hire_date = sysdate, job_id = id_job, salary = salariu_dep_nou, commission_pct = comision, manager_id = id_manager, department_id = id_department
+        WHERE employee_id = id_angajat;
+    END angajat_mutare;
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER IS
+    nr NUMBER; 
+    BEGIN
+        SELECT COUNT(*)                         --doar directi
+        INTO nr 
+        FROM employees e
+        JOIN employees m ON e.manager_id = m.employee_id
+        WHERE m.first_name = prenume AND m.last_name = nume;
+       
+        RETURN nr;
+    END nr_subalterni;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE) IS
+    id_primul_manager employees.manager_id%TYPE;
+    id_managerul_managerului employees.manager_id%TYPE;
+    BEGIN
+        SELECT manager_id
+        INTO id_primul_manager
+        FROM employees
+        WHERE employee_id = id_angajat;
+        
+        SELECT manager_id
+        INTO id_managerul_managerului
+        FROM employees
+        WHERE employee_id = id_primul_manager;
+       
+        UPDATE employees
+        SET manager_id = id_managerul_managerului
+        WHERE employee_id = id_angajat;  
+    END promovare;
+    PROCEDURE salariu_actualizare(salariu_nou employees.salary%TYPE, nume employees.first_name%TYPE)
+    IS 
+    nr NUMBER; 
+    BEGIN
+        SELECT COUNT(*)
+        INTO nr
+        FROM employees
+        WHERE first_name = nume; 
+        IF nr = 0 THEN
+            dbms_output.put_line('Nu exista angajati');
+        ELSIF NR>1 THEN
+            dbms_output.put_line('Exista mai multi angajati');
+        ELSE  
+            UPDATE employees
+            SET salary = salariu_nou
+            WHERE first_name = nume; 
+        END IF;
+    END salariu_actualizare;
+END pachet1;
+
+----------------------------------f)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type, nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE);
+    PROCEDURE salariu_actualizare(salariu_nou employees.salary%TYPE, nume employees.first_name%TYPE);
+    CURSOR lista_angajati(id_job employees.job_id%type) IS
+        SELECT *
+        FROM employees
+        WHERE job_id=id_job;
+END pachet1;
+/
+-- body-ul este la fel
+
+-----------------------------g)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type, nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE);
+    PROCEDURE salariu_actualizare(salariu_nou employees.salary%TYPE, nume employees.first_name%TYPE);
+    CURSOR lista_angajati(id_job employees.job_id%type) IS
+        SELECT *
+        FROM employees
+        WHERE job_id=id_job;
+    CURSOR lista_joburi IS
+        SELECT *
+        FROM jobs;
+END pachet1;
+/
+
+-- body-ul este la fel
+
+-----------------------------------h)
+
+CREATE OR REPLACE PACKAGE pachet1 AS
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type, nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE);
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE);
+    PROCEDURE salariu_actualizare(salariu_nou employees.salary%TYPE, nume employees.first_name%TYPE);
+    CURSOR lista_angajati(id_job employees.job_id%type) IS
+        SELECT *
+        FROM employees
+        WHERE job_id=id_job;
+    CURSOR lista_joburi IS
+        SELECT *
+        FROM jobs;
+    PROCEDURE afisare;
+END pachet1;
+/
+CREATE OR REPLACE PACKAGE BODY pachet1 IS 
+    FUNCTION salariu_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN NUMBER is 
+    salariu employees.salary%TYPE;
+    BEGIN
+        SELECT MIN(salary) 
+        INTO salariu 
+        FROM employees 
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN salariu;    --10
+    END salariu_adaugare;
+    FUNCTION id_manager_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE) 
+    RETURN NUMBER IS 
+    id_manager employees.manager_id%TYPE;
+    BEGIN
+        SELECT employee_id 
+        INTO id_manager 
+        FROM employees 
+        WHERE first_name = nume AND last_name = prenume;
+        RETURN id_manager;
+    END id_manager_adaugare;
+    FUNCTION id_department_adaugare(nume_dep departments.department_name%TYPE) 
+    RETURN NUMBER IS
+    id_department departments.department_id%TYPE;   --24
+    BEGIN
+        SELECT department_id
+        INTO id_department
+        FROM departments 
+        WHERE department_name = nume_dep;
+        RETURN id_department;
+    END id_department_adaugare;
+    FUNCTION id_job_adaugare(nume_job jobs.job_title%TYPE) 
+    RETURN NUMBER is
+        id_job jobs.job_id%TYPE;
+    BEGIN
+        SELECT job_id
+        INTO id_job
+        FROM jobs
+        WHERE job_title = nume_job;
+        RETURN id_job;         --40
+    END id_job_adaugare;
+    PROCEDURE angajat_adaugare(nume employees.first_name%TYPE, prenume employees.last_name%TYPE, telefon employees.phone_number%TYPE, email employees.email%TYPE, 
+                            nume_manager employees.last_name%TYPE, prenume_manager employees.last_name%TYPE,
+                            nume_dep departments.department_name%type, nume_job jobs.job_title%TYPE)
+    IS 
+        salariu employees.salary%TYPE;
+        id_manager employees.employee_id%TYPE; 
+        id_department departments.department_id%TYPE;
+        id_job jobs.job_title%TYPE;
+    BEGIN      --50
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu := salariu_adaugare(id_department, id_job); 
+        INSERT INTO employees VALUES (
+            employee_id_secventa.NEXTVAL,
+            nume, 
+            prenume, 
+            email, 
+            telefon, 
+            sysdate,
+            id_job,
+            salariu, 
+            0,
+            id_manager,
+            id_department);
+    END angajat_adaugare;
+    FUNCTION comision_adaugare(id_dep employees.department_id%TYPE, id_job employees.job_id%TYPE)
+    RETURN employees.commission_pct%TYPE IS
+    comision   employees.commission_pct%TYPE;   --70
+    BEGIN
+        SELECT min(commission_pct)
+        INTO comision 
+        FROM employees
+        WHERE department_id = id_dep AND job_id = id_job;
+        RETURN comision;
+    END comision_adaugare;
+    PROCEDURE angajat_mutare(nume employees.last_name%TYPE, prenume employees.last_name%type,nume_manager employees.last_name%type, 
+                       prenume_manager employees.last_name%TYPE, nume_dep departments.department_name%TYPE, nume_job jobs.job_title%TYPE)
+    IS                                                                      --80
+    id_angajat employees.employee_id%TYPE;
+    salariu_dep_nou employees.salary%TYPE;
+    salariu_dep_vechi employees.salary%TYPE;
+    comision employees.commission_pct%type;
+    id_manager employees.employee_id%TYPE; 
+    id_department departments.department_id%TYPE;
+    id_job jobs.job_title%TYPE;
+    BEGIN 
+        SELECT salary, employee_id
+        INTO salariu_dep_vechi, id_angajat    --90
+        FROM employees
+        WHERE last_name = nume AND first_name = prenume;
+        
+        id_manager := id_manager_adaugare(nume_manager, prenume_manager);
+        id_department := id_department_adaugare(nume_dep);
+        id_job := id_job_adaugare(nume_job);
+        salariu_dep_nou :=salariu_adaugare(id_department,id_job);
+        comision := comision_adaugare(id_department, id_job);
+        
+        IF salariu_dep_nou > salariu_dep_vechi THEN    --100
+            salariu_dep_nou := salariu_dep_vechi;
+        END IF;
+        UPDATE employees 
+        SET hire_date = sysdate, job_id = id_job, salary = salariu_dep_nou, commission_pct = comision, manager_id = id_manager, department_id = id_department
+        WHERE employee_id = id_angajat;
+    END angajat_mutare;
+    FUNCTION nr_subalterni(nume employees.last_name%TYPE, prenume employees.first_name%TYPE)
+    RETURN NUMBER IS
+    nr NUMBER; 
+    BEGIN
+        SELECT COUNT(*)                         --doar directi
+        INTO nr 
+        FROM employees e
+        JOIN employees m ON e.manager_id = m.employee_id
+        WHERE m.first_name = prenume AND m.last_name = nume;
+       
+        RETURN nr;
+    END nr_subalterni;
+    PROCEDURE promovare(id_angajat employees.employee_id%TYPE) IS
+    id_primul_manager employees.manager_id%TYPE;
+    id_managerul_managerului employees.manager_id%TYPE;
+    BEGIN
+        SELECT manager_id
+        INTO id_primul_manager
+        FROM employees
+        WHERE employee_id = id_angajat;
+        
+        SELECT manager_id
+        INTO id_managerul_managerului
+        FROM employees                                    --130
+        WHERE employee_id = id_primul_manager;
+       
+        UPDATE employees
+        SET manager_id = id_managerul_managerului
+        WHERE employee_id = id_angajat;  
+    END promovare;
+    PROCEDURE salariu_actualizare(salariu_nou employees.salary%TYPE, nume employees.first_name%TYPE)
+    IS 
+    nr NUMBER; 
+    BEGIN                                               --140
+        SELECT COUNT(*)
+        INTO nr
+        FROM employees
+        WHERE first_name = nume; 
+        IF nr = 0 THEN
+            dbms_output.put_line('Nu exista angajati');
+        ELSIF NR>1 THEN
+            dbms_output.put_line('Exista mai multi angajati');
+        ELSE  
+            UPDATE employees                                --150
+            SET salary = salariu_nou
+            WHERE first_name = nume; 
+        END IF;
+    END salariu_actualizare;
+    PROCEDURE afisare IS
+    nr_joburi number;
+    BEGIN 
+        FOR i IN pachet1.lista_joburi LOOP                          --160
+            DBMS_OUTPUT.PUT_LINE(i.job_title);
+            FOR j IN pachet1.lista_angajati(i.job_id) LOOP 
+            DBMS_OUTPUT.PUT_LINE(j.last_name || j.first_name); 
+            END LOOP; 
+        DBMS_OUTPUT.new_line;
+        END LOOP;
+    END afisare;
+END pachet1;
+
+
+
+
+
+
+

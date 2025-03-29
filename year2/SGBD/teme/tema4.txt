@@ -1,0 +1,61 @@
+CREATE TABLE info_sai( 
+    utilizator  VARCHAR2(100),
+    data        DATE,
+    comanda     VARCHAR2(100),
+    nr_linii    NUMBER(5),
+    eroare      VARCHAR2(100));
+/
+
+
+CREATE OR REPLACE TYPE exc4_return AS VARRAY(100) OF NUMBER(6,0);
+/
+
+CREATE OR REPLACE PROCEDURE
+exc4 (man_id IN employees.manager_id%TYPE,
+    exc4_res OUT exc4_return) IS 
+    exc4_nr info_sai.nr_linii%TYPE ;
+    exc4_eroare info_sai.eroare%TYPE;
+    exc4_utilizator info_sai.utilizator%TYPE;
+    exc4_comanda info_sai.comanda%TYPE;
+    OK BOOLEAN:= FALSE;
+BEGIN
+    SELECT user INTO exc4_utilizator FROM dual;
+    IF man_id IS NULL THEN 
+        exc4_nr:= 0;
+        exc4_eroare:= 'Managerul nu exista';
+        exc4_comanda:= 'Nicio comanda';
+        OK :=TRUE;
+    END IF;
+    SELECT employee_id BULK COLLECT INTO exc4_res
+    FROM employees
+    WHERE manager_id = man_id; 
+    
+    FOR i IN exc4_res.FIRST..exc4_res.LAST LOOP
+        UPDATE employees SET salary = salary + ( 10 * salary ) / 100
+        WHERE employee_id = exc4_res(i);
+    END LOOP;
+    IF OK = FALSE THEN 
+        exc4_nr := exc4_res.COUNT;
+        exc4_eroare := 'Nicio eroare';
+        exc4_comanda := 'Update';
+    END IF;
+    INSERT INTO info_sai VALUES (
+        exc4_utilizator,
+        sysdate,
+        exc4_comanda,
+        exc4_nr,
+        exc4_eroare
+    ); 
+END exc4;
+/
+
+
+DECLARE
+res exc4_return;
+BEGIN
+    exc4(100,res);
+    FOR i IN res.FIRST..res.LAST LOOP
+        DBMS_OUTPUT.PUT_LINE(res(i)); 
+    END LOOP;
+END;
+/

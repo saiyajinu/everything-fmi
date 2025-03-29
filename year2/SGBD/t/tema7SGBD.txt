@@ -1,0 +1,169 @@
+EX 1  
+DECLARE 
+    nume employees.first_name%type;
+    salariu employees.salary%type;
+    titlu1 jobs.job_title%type;
+    titlu2 jobs.job_title%type;
+    CURSOR c IS
+    SELECT job_title,first_name,salary 
+    FROM  employees e
+    RIGHT JOIN jobs j ON e.job_id=j.job_id; 
+BEGIN
+    OPEN c;
+    LOOP
+    FETCH c INTO titlu1,nume,salariu;
+    EXIT WHEN c%NOTFOUND; 
+        DBMS_OUTPUT.PUT_LINE(titlu1); 
+        DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu);
+            LOOP
+            FETCH c INTO titlu2,nume,salariu;
+            EXIT WHEN titlu2!=titlu1; 
+                DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu);
+            END LOOP;
+    END LOOP;
+    CLOSE c;
+END;
+
+EX 2 
+DECLARE 
+    nume employees.first_name%type;
+    salariu employees.salary%type;
+    titlu1 jobs.job_title%type;
+    titlu2 jobs.job_title%type;
+    nrAngajati NUMBER(3):= 0;
+    venitTotalJob NUMBER(10):= 0; 
+    venitMediuJob NUMBER(10):= 0; 
+    venit NUMBER(10):= 0;
+    comision employees.commission_pct%TYPE;
+    CURSOR c IS
+    SELECT job_title,first_name,salary,commission_pct 
+    FROM  employees e
+    RIGHT JOIN jobs j ON e.job_id=j.job_id; 
+BEGIN
+    OPEN c;
+    LOOP
+    nrAngajati:= 0;
+    venitTotalJob:= 0;  
+    FETCH c INTO titlu1,nume,salariu,comision;
+    nrAngajati:=nrAngajati+1;
+    IF comision IS NOT NULL
+    THEN 
+        venit:= salariu + comision * salariu; -- cum am calculat venitul la laborator 
+    ELSE 
+        venit:= salariu;
+    END IF;
+    venitTotalJob:= venitTotalJob + venit;   
+    EXIT WHEN c%NOTFOUND; 
+        DBMS_OUTPUT.PUT_LINE(titlu1);  
+        DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu);
+            LOOP
+            FETCH c INTO titlu2,nume,salariu,comision;
+            EXIT WHEN titlu2!=titlu1; 
+                nrAngajati:=nrAngajati+1;
+                IF comision IS NOT NULL
+                THEN 
+                    venit:= salariu + comision * salariu; -- cum am calculat venitul la laborator 
+                ELSE 
+                    venit:= salariu;
+                END IF;
+                DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu);
+                venitTotalJob:= venitTotalJob + venit; 
+            END LOOP;
+            venitMediuJob:= venitTotalJob / nrAngajati;
+            DBMS_OUTPUT.PUT_LINE(nrAngajati || ' ' || venitTotalJob || ' ' ||  venitMediuJob); 
+    END LOOP;
+    CLOSE c;
+END;
+ 
+
+EX 3
+DECLARE 
+    nume employees.first_name%type;
+    salariu employees.salary%type;
+    titlu1 jobs.job_title%type;
+    titlu2 jobs.job_title%type;
+    comisionTotal NUMBER(10,2):= 0;
+    venitTotal NUMBER(10):= 0; 
+    procent NUMBER(3):= 0; 
+    comision employees.commission_pct%TYPE;
+    CURSOR c IS
+    SELECT job_title,first_name,salary,commission_pct 
+    FROM  employees e
+    RIGHT JOIN jobs j ON e.job_id=j.job_id; 
+
+    CURSOR p IS
+    SELECT job_title,first_name,salary,commission_pct 
+    FROM  employees e
+    RIGHT JOIN jobs j ON e.job_id=j.job_id;     
+BEGIN
+    OPEN c;
+    LOOP   
+    FETCH c INTO titlu1,nume,salariu,comision; 
+    IF comision IS NOT NULL
+    THEN  
+        comisionTotal:= comisionTotal + comision; 
+    END IF;
+    venitTotal:= venitTotal + salariu;   
+    EXIT WHEN c%NOTFOUND;  
+            LOOP
+            FETCH c INTO titlu2,nume,salariu,comision;
+            EXIT WHEN titlu2!=titlu1;  
+                IF comision IS NOT NULL
+                THEN    
+                    comisionTotal:= comisionTotal + comision; 
+                END IF; 
+                venitTotal:= venitTotal + salariu; 
+            END LOOP; 
+    END LOOP; 
+    CLOSE c; 
+    DBMS_OUTPUT.PUT_LINE(venitTotal || ' ' || comisionTotal);
+    
+    OPEN c;
+    LOOP   
+    FETCH c INTO titlu1,nume,salariu,comision;    
+    EXIT WHEN c%NOTFOUND; 
+        DBMS_OUTPUT.PUT_LINE(titlu1); 
+        procent:= ( salariu*100 ) / venitTotal;
+        DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu || ' ' || procent);
+            LOOP
+            FETCH c INTO titlu2,nume,salariu,comision;
+                procent:= (salariu*100) / venitTotal; 
+                DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu || ' ' || procent);
+            END LOOP; 
+    END LOOP; 
+    CLOSE c;
+END;
+
+EX 4 
+DECLARE 
+    nume employees.first_name%type;
+    salariu employees.salary%type;
+    titlu1 jobs.job_title%type;
+    titlu2 jobs.job_title%type;
+    
+    CURSOR c IS
+        SELECT MAX(job_title), salary, MAX(first_name)
+        FROM  employees e
+        RIGHT JOIN jobs j ON e.job_id=j.job_id
+        GROUP BY salary
+        ORDER BY salary DESC;  
+BEGIN
+    OPEN c;
+    LOOP
+        FETCH c INTO titlu1, salariu,nume;
+        EXIT WHEN c%ROWCOUNT>5 OR c%NOTFOUND; 
+            DBMS_OUTPUT.PUT_LINE(titlu1); 
+            DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu);
+                LOOP
+                FETCH c INTO titlu2,salariu,nume;
+                EXIT WHEN titlu2!=titlu1; 
+                    DBMS_OUTPUT.PUT_LINE(nume || ' ' || salariu);
+                END LOOP;
+        IF c%ROWCOUNT<5
+            THEN 
+                DBMS_OUTPUT.PUT_LINE('Nu exista atatia angajati');
+        END IF;
+    END LOOP;
+    CLOSE c;
+END;
+
